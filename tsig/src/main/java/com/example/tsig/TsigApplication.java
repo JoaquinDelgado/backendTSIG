@@ -1,6 +1,7 @@
 package com.example.tsig;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.springframework.aop.scope.ScopedProxyUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpHeaders;
@@ -21,6 +23,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.bind.annotation.CrossOrigin;
+
+import java.lang.reflect.InvocationTargetException;
+
 
 @SpringBootApplication
 public class TsigApplication {
@@ -306,5 +311,48 @@ class DireccionesController {
 
 		return response;
 
+	}
+
+	@GetMapping("/direcEnPoligono")
+	@CrossOrigin(origins = "*") // Permitir todas las IPs
+	public ResponseEntity<String> direcEnPoligono(@RequestParam(value = "limit", required = false) Integer limit, @RequestParam(value = "poligono", required = true) String poligono, @RequestParam(value = "tipoDirec", required = false) String tipoDirec) throws JsonProcessingException {
+		RestTemplate restTemplate = new RestTemplate();
+
+		// Configurar los encabezados de la solicitud
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.add("Access-Control-Allow-Origin", "*");
+		// Agregar otros encabezados si es necesario
+
+		// Construir los parámetros
+		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+		params.add("poligono", poligono);
+		if (limit != null) {
+			params.add("limit", limit.toString());
+		}
+		if (tipoDirec != null) {
+			params.add("tipoDirec", tipoDirec);
+		}
+
+		// Construir la URL con los parámetros
+		String url = "https://direcciones.ide.uy/api/v1/geocode/direcEnPoligono";
+		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url)
+				.queryParams(params);
+		String fullUrl = builder.toUriString();
+
+		// Crear una entidad HttpEntity con los encabezados
+		HttpEntity<String> entity = new HttpEntity<>(headers);
+
+		// Obtener la respuesta del servicio externo
+		try {
+			System.out.println(poligono);
+			ResponseEntity<String> response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+			insertarEnBase(response, "DIRECENPOLIGONO");
+			return response;
+		} catch (RestClientException e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+		}
+		return null;
 	}
 }
