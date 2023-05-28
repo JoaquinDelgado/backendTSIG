@@ -54,6 +54,23 @@ class DireccionesController {
 		}
 	}
 
+
+	@GetMapping("/obtenerGeoCoders")
+	@CrossOrigin(origins = "*") // Permitir todas las IPs
+	public ResponseEntity<Map<Integer,String>> obtenerGeoCoders() throws JsonProcessingException {
+
+		// Configurar los encabezados de la solicitud
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.add("Access-Control-Allow-Origin", "*");
+		// Agregar otros encabezados si es necesario
+
+		Map<Integer,String>  geoCoders= new HashMap<Integer,String>();
+		geoCoders.put(1, "AGESIC");
+		ResponseEntity<Map<Integer,String>> response = new ResponseEntity<Map<Integer,String>>(geoCoders, headers, HttpStatus.OK);
+		return response;
+	}
+
 	@GetMapping("/{idGeoCoder}/formasCanonicas")
 	@CrossOrigin(origins = "*") // Permitir todas las IPs
 	public ResponseEntity<Map<Integer,String>> formasCanonicas(@PathVariable("idGeoCoder") Integer idGeoCoder) throws JsonProcessingException {
@@ -407,7 +424,6 @@ class DireccionesController {
 
 	@GetMapping("/sugerenciaCalleCompleta")
 	@CrossOrigin(origins = "*") // Permitir todas las IPs
-
 	public ResponseEntity<String> sugerenciaCalleCompleta(@RequestParam(value = "entrada", required = true) String entrada, @RequestParam(value = "todos", required = false) Boolean todos) throws JsonProcessingException {
 		RestTemplate restTemplate = new RestTemplate();
 
@@ -560,4 +576,5 @@ class DireccionesController {
 		}
 		return null;
 	}
+
 }
