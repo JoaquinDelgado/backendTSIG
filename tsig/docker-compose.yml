@@ -22,9 +22,3 @@ services:
       PGADMIN_DEFAULT_PASSWORD: tsig
     ports:
       - 5050:80
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - 8080:8080

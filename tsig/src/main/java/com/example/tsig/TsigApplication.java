@@ -1,7 +1,6 @@
 package com.example.tsig;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.springframework.aop.scope.ScopedProxyUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -23,8 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.bind.annotation.CrossOrigin;
-
-import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @SpringBootApplication
@@ -53,6 +53,228 @@ class DireccionesController {
 			System.out.println("A new row has been inserted.");
 		}
 	}
+
+
+	@GetMapping("/obtenerGeoCoders")
+	@CrossOrigin(origins = "*") // Permitir todas las IPs
+	public ResponseEntity<Map<Integer,String>> obtenerGeoCoders() throws JsonProcessingException {
+
+		// Configurar los encabezados de la solicitud
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.add("Access-Control-Allow-Origin", "*");
+		// Agregar otros encabezados si es necesario
+
+		Map<Integer,String>  geoCoders= new HashMap<Integer,String>();
+		geoCoders.put(1, "AGESIC");
+		ResponseEntity<Map<Integer,String>> response = new ResponseEntity<Map<Integer,String>>(geoCoders, headers, HttpStatus.OK);
+		return response;
+	}
+
+	@GetMapping("/{idGeoCoder}/formasCanonicas")
+	@CrossOrigin(origins = "*") // Permitir todas las IPs
+	public ResponseEntity<Map<Integer,String>> formasCanonicas(@PathVariable("idGeoCoder") Integer idGeoCoder) throws JsonProcessingException {
+
+		// Configurar los encabezados de la solicitud
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.add("Access-Control-Allow-Origin", "*");
+		// Agregar otros encabezados si es necesario
+
+		Map<Integer,String> formasCanonicas = new HashMap<Integer,String>();
+		switch (idGeoCoder) {
+			case 1:		
+				formasCanonicas.put(1, "calle,numero,localidad,departamento");
+				formasCanonicas.put(2, "calle,numero,calle2,localidad,departamento");
+				formasCanonicas.put(3, "calle,manzana,solar,localidad,departamento");
+				formasCanonicas.put(4, "nombreInmueble,localidad,departamento");
+				formasCanonicas.put(5, "numeroRuta,kilometro");
+
+			}
+
+
+		ResponseEntity<Map<Integer,String>> response = new ResponseEntity<Map<Integer,String>>(formasCanonicas, headers, HttpStatus.OK);
+
+
+		return response;
+	}
+
+	@GetMapping("/busquedaDireccionStructurada/{idGeoCoder}/{formaCaninica}")
+	@CrossOrigin(origins = "*") // Permitir todas las IPs
+	public ResponseEntity<String> busquedaDireccion(
+			@PathVariable("idGeoCoder") Integer idGeoCoder,
+			@PathVariable("formaCaninica") Integer formaCanonica,
+			@RequestParam(value = "calle", required = false) String calle,
+			@RequestParam(value = "numero", required = false) String numero,
+			@RequestParam(value = "localidad", required = false) String localidad,
+			@RequestParam(value = "departamento", required = false) String departamento,
+			@RequestParam(value = "calle2", required = false) String calle2,
+			@RequestParam(value = "manzana", required = false) String manzana,
+			@RequestParam(value = "solar", required = false) String solar,
+			@RequestParam(value = "nombreInmueble", required = false) String nombreInmueble,
+			@RequestParam(value = "numeroRuta", required = false) Integer numeroRuta,
+			@RequestParam(value = "kilometro", required = false) Double kilometro
+
+		) throws JsonProcessingException {
+
+		RestTemplate restTemplate = new RestTemplate();
+
+		// Configurar los encabezados de la solicitud
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.add("Access-Control-Allow-Origin", "*");
+		// Agregar otros encabezados si es necesario
+
+		// Construir los parámetros
+		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+		
+		
+		if(idGeoCoder==1){
+			String url = "https://direcciones.ide.uy/api/v0/geocode/BusquedaDireccion";;	
+			String calleGeoCoder;
+			UriComponentsBuilder builder;
+			String fullUrl;
+			HttpEntity<String> entity;
+			ResponseEntity<String> response;
+
+			switch (formaCanonica){
+				case 1 :
+					if (calle==null){
+						return new ResponseEntity<String>("Calle no puede ser vacio", headers, HttpStatus.BAD_REQUEST);
+					}
+					calleGeoCoder = calle + (numero!=null ? " "+numero : "");
+					// Construir la URL con los parámetros
+					params.add("calle", calleGeoCoder);
+					params.add("localidad",localidad);
+					params.add("departamento", departamento);
+					
+					builder = UriComponentsBuilder.fromHttpUrl(url)
+							.queryParams(params);
+					fullUrl = builder.toUriString();
+			
+					// Crear una entidad HttpEntity con los encabezados
+					entity = new HttpEntity<>(headers);
+			
+					// Hacer la solicitud GET al servicio externo
+			
+					// Obtener la respuesta del servicio externo
+					response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+					return response;
+				case 2:
+					if (calle==null){
+						return new ResponseEntity<String>("Calle no puede ser vacio", headers, HttpStatus.BAD_REQUEST);
+					}
+					if (calle2==null){
+						return new ResponseEntity<String>("Calle2 no puede ser vacio", headers, HttpStatus.BAD_REQUEST);
+					}
+					calleGeoCoder = calle + (numero!=null ? " "+numero : "") +" esquina "+calle2;
+					// Construir la URL con los parámetros
+					params.add("calle", calleGeoCoder);
+					params.add("localidad",localidad);
+					params.add("departamento", departamento);
+					url = "https://direcciones.ide.uy/api/v0/geocode/BusquedaDireccion";
+					builder = UriComponentsBuilder.fromHttpUrl(url)
+							.queryParams(params);
+					fullUrl = builder.toUriString();
+			
+					// Crear una entidad HttpEntity con los encabezados
+					entity = new HttpEntity<>(headers);
+			
+					// Hacer la solicitud GET al servicio externo
+			
+					// Obtener la respuesta del servicio externo
+					response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+					return response;
+				case 3:
+					if (departamento==null){
+						return new ResponseEntity<String>("Departamento no puede ser vacio", headers, HttpStatus.BAD_REQUEST);
+					}
+					if (localidad==null){
+						return new ResponseEntity<String>("Localidad no puede ser vacio", headers, HttpStatus.BAD_REQUEST);
+					}
+					if (manzana==null){
+						return new ResponseEntity<String>("Manzana no puede ser vacio", headers, HttpStatus.BAD_REQUEST);
+					}
+					if (solar==null){
+						return new ResponseEntity<String>("Solar no puede ser vacio", headers, HttpStatus.BAD_REQUEST);
+					}
+					calleGeoCoder = calle!=null ? calle+" " : "" + "manzana "+manzana+" solar "+solar;
+					System.out.println(calleGeoCoder);
+
+					params.add("calle", calleGeoCoder);
+					params.add("localidad",localidad);
+					params.add("departamento", departamento);
+					url = "https://direcciones.ide.uy/api/v0/geocode/BusquedaDireccion";
+					builder = UriComponentsBuilder.fromHttpUrl(url)
+							.queryParams(params);
+					fullUrl = builder.toUriString();
+			
+					// Crear una entidad HttpEntity con los encabezados
+					entity = new HttpEntity<>(headers);
+			
+					// Hacer la solicitud GET al servicio externo
+			
+					// Obtener la respuesta del servicio externo
+					response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+					return response;
+				case 4: 
+					if (nombreInmueble==null){
+						return new ResponseEntity<String>("nombreInmueble no puede ser vacio", headers, HttpStatus.BAD_REQUEST);
+					}
+					params.add("calle", nombreInmueble);
+					params.add("localidad",localidad);
+					params.add("departamento", departamento);
+					url = "https://direcciones.ide.uy/api/v0/geocode/BusquedaDireccion";
+					builder = UriComponentsBuilder.fromHttpUrl(url)
+							.queryParams(params);
+					fullUrl = builder.toUriString();
+			
+					// Crear una entidad HttpEntity con los encabezados
+					entity = new HttpEntity<>(headers);
+			
+					// Hacer la solicitud GET al servicio externo
+			
+					// Obtener la respuesta del servicio externo
+					response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+					return response;
+				case 5:
+					if (numeroRuta == null){
+						return new ResponseEntity<String>("numeroRuta no puede ser vacio", headers, HttpStatus.BAD_REQUEST);
+					}
+					if (kilometro == null){
+						return new ResponseEntity<String>("kilometro no puede ser vacio", headers, HttpStatus.BAD_REQUEST);
+					}
+					params.add("km", kilometro.toString());
+					params.add("ruta", numeroRuta.toString());
+			
+					// Construir la URL con los parámetros
+					url = "https://direcciones.ide.uy/api/v1/geocode/rutakm";
+					builder = UriComponentsBuilder.fromHttpUrl(url)
+							.queryParams(params);
+					fullUrl = builder.toUriString();
+			
+					// Crear una entidad HttpEntity con los encabezados
+					entity = new HttpEntity<>(headers);
+			
+					// Obtener la respuesta del servicio externo
+					response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+			
+					//insertarEnBase(response, "RUTAKM");
+			
+					return response;
+					
+			}
+			
+	
+		}
+
+		return null;
+
+		//insertarEnBase(response, "BUSQUEDADIRECCION");
+
+	}
+
+
 
 	@GetMapping("/busquedaDireccion/{calle}")
 	@CrossOrigin(origins = "*") // Permitir todas las IPs
@@ -202,7 +424,6 @@ class DireccionesController {
 
 	@GetMapping("/sugerenciaCalleCompleta")
 	@CrossOrigin(origins = "*") // Permitir todas las IPs
-
 	public ResponseEntity<String> sugerenciaCalleCompleta(@RequestParam(value = "entrada", required = true) String entrada, @RequestParam(value = "todos", required = false) Boolean todos) throws JsonProcessingException {
 		RestTemplate restTemplate = new RestTemplate();
 
@@ -355,4 +576,5 @@ class DireccionesController {
 		}
 		return null;
 	}
+
 }
