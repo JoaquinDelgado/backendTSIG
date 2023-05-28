@@ -1,5 +1,6 @@
 package com.example.tsig;
 
+import com.example.tsig.utils.Utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -8,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpHeaders;
@@ -24,8 +24,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
 
 @SpringBootApplication
 public class TsigApplication {
@@ -54,56 +54,56 @@ class DireccionesController {
 		}
 	}
 
+	@GetMapping("/formasCanonicas")
+	@CrossOrigin(origins = "*") // Permitir todas las IPs
+	public ResponseEntity<Map<Integer,String>> formasCanonicas() throws JsonProcessingException {
+
+		// Configurar los encabezados de la solicitud
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		// Agregar otros encabezados si es necesario
+
+		Map<Integer,String> formasCanonicas = new HashMap<>();
+
+		String sql = "SELECT * FROM canonic_forms";
+		List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
+
+		// Procesar los resultados
+		for (Map<String, Object> row : rows) {
+			formasCanonicas.put((Integer) row.get("id"), (String) row.get("canonic_form"));
+		}
+
+		return new ResponseEntity<>(formasCanonicas, headers, HttpStatus.OK);
+	}
 
 	@GetMapping("/obtenerGeoCoders")
 	@CrossOrigin(origins = "*") // Permitir todas las IPs
-	public ResponseEntity<Map<Integer,String>> obtenerGeoCoders() throws JsonProcessingException {
+	public ResponseEntity<Map<Integer,String>>
+	obtenerGeoCoders(@RequestParam(value = "idFormaCanonica", required = true) Integer idFormaCanonica) throws JsonProcessingException {
 
 		// Configurar los encabezados de la solicitud
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.add("Access-Control-Allow-Origin", "*");
 		// Agregar otros encabezados si es necesario
 
-		Map<Integer,String>  geoCoders= new HashMap<Integer,String>();
-		geoCoders.put(1, "AGESIC");
-		ResponseEntity<Map<Integer,String>> response = new ResponseEntity<Map<Integer,String>>(geoCoders, headers, HttpStatus.OK);
-		return response;
+		Map<Integer,String> geoCoders = new HashMap<>();
+
+		String sql = "SELECT g.ID, g.GEOCODER FROM GEOCODERS g INNER JOIN geocoders_canonic_forms gcf ON gcf.id_geocoder = g.id WHERE gcf.id_canonic_form = ?";
+		List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql, idFormaCanonica);
+
+		// Procesar los resultados
+		for (Map<String, Object> row : rows) {
+			geoCoders.put((Integer) row.get("id"), (String) row.get("geocoder"));
+		}
+
+		return new ResponseEntity<>(geoCoders, headers, HttpStatus.OK);
 	}
 
-	@GetMapping("/{idGeoCoder}/formasCanonicas")
+	@GetMapping("/busquedaDireccionEstructurada/{idGeoCoder}/{idFormaCanonica}")
 	@CrossOrigin(origins = "*") // Permitir todas las IPs
-	public ResponseEntity<Map<Integer,String>> formasCanonicas(@PathVariable("idGeoCoder") Integer idGeoCoder) throws JsonProcessingException {
-
-		// Configurar los encabezados de la solicitud
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.add("Access-Control-Allow-Origin", "*");
-		// Agregar otros encabezados si es necesario
-
-		Map<Integer,String> formasCanonicas = new HashMap<Integer,String>();
-		switch (idGeoCoder) {
-			case 1:		
-				formasCanonicas.put(1, "calle,numero,localidad,departamento");
-				formasCanonicas.put(2, "calle,numero,calle2,localidad,departamento");
-				formasCanonicas.put(3, "calle,manzana,solar,localidad,departamento");
-				formasCanonicas.put(4, "nombreInmueble,localidad,departamento");
-				formasCanonicas.put(5, "numeroRuta,kilometro");
-
-			}
-
-
-		ResponseEntity<Map<Integer,String>> response = new ResponseEntity<Map<Integer,String>>(formasCanonicas, headers, HttpStatus.OK);
-
-
-		return response;
-	}
-
-	@GetMapping("/busquedaDireccionStructurada/{idGeoCoder}/{formaCaninica}")
-	@CrossOrigin(origins = "*") // Permitir todas las IPs
-	public ResponseEntity<String> busquedaDireccion(
+	public ResponseEntity<?> busquedaDireccionEstructurada(
 			@PathVariable("idGeoCoder") Integer idGeoCoder,
-			@PathVariable("formaCaninica") Integer formaCanonica,
+			@PathVariable("idFormaCanonica") Integer idFormaCanonica,
 			@RequestParam(value = "calle", required = false) String calle,
 			@RequestParam(value = "numero", required = false) String numero,
 			@RequestParam(value = "localidad", required = false) String localidad,
@@ -122,22 +122,20 @@ class DireccionesController {
 		// Configurar los encabezados de la solicitud
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.add("Access-Control-Allow-Origin", "*");
 		// Agregar otros encabezados si es necesario
 
 		// Construir los parámetros
 		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-		
-		
-		if(idGeoCoder==1){
-			String url = "https://direcciones.ide.uy/api/v0/geocode/BusquedaDireccion";;	
+
+		if(idGeoCoder == 1){
+			String url = "https://direcciones.ide.uy/api/v0/geocode/BusquedaDireccion";
 			String calleGeoCoder;
 			UriComponentsBuilder builder;
 			String fullUrl;
 			HttpEntity<String> entity;
 			ResponseEntity<String> response;
 
-			switch (formaCanonica){
+			switch (idFormaCanonica){
 				case 1 :
 					if (calle==null){
 						return new ResponseEntity<String>("Calle no puede ser vacio", headers, HttpStatus.BAD_REQUEST);
@@ -151,7 +149,8 @@ class DireccionesController {
 					builder = UriComponentsBuilder.fromHttpUrl(url)
 							.queryParams(params);
 					fullUrl = builder.toUriString();
-			
+
+					System.out.println(fullUrl);
 					// Crear una entidad HttpEntity con los encabezados
 					entity = new HttpEntity<>(headers);
 			
@@ -259,24 +258,108 @@ class DireccionesController {
 					// Obtener la respuesta del servicio externo
 					response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
 			
-					//insertarEnBase(response, "RUTAKM");
-			
+					insertarEnBase(response, "RUTAKM");
 					return response;
-					
+				default:
+					return new ResponseEntity<>("IDFORMACANONICA INVALIDO", headers, HttpStatus.BAD_REQUEST);
 			}
-			
-	
 		}
+		if(idGeoCoder == 2) {
 
-		return null;
+			String url = "https://nominatim.openstreetmap.org/search";
+			UriComponentsBuilder builder;
+			String fullUrl;
+			HttpEntity<String> entity;
+			ResponseEntity<String> response;
+			switch (idFormaCanonica) {
+				case 6 -> {
+					// Construir la URL con los parámetros
+					calle = Utils.RemplazarTildesYEspacios(calle);
+					params.add("street", calle + "+" + numero);
+					params.add("format", "json");
+					builder = UriComponentsBuilder.fromHttpUrl(url)
+							.queryParams(params);
+					fullUrl = builder.toUriString();
 
-		//insertarEnBase(response, "BUSQUEDADIRECCION");
+					// Crear una entidad HttpEntity con los encabezados
+					entity = new HttpEntity<>(headers);
+					System.out.println(fullUrl);
+					// Hacer la solicitud GET al servicio externo
+
+					// Obtener la respuesta del servicio externo
+					response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+					return response;
+				}
+				case 4 -> {
+					// Construir la URL con los parámetros
+					nombreInmueble = Utils.RemplazarTildesYEspacios(nombreInmueble);
+					departamento = Utils.RemplazarTildesYEspacios(departamento);
+					params.add("q", nombreInmueble + "+" + departamento);
+					params.add("format", "json");
+					builder = UriComponentsBuilder.fromHttpUrl(url)
+							.queryParams(params);
+					fullUrl = builder.toUriString();
+
+					// Crear una entidad HttpEntity con los encabezados
+					entity = new HttpEntity<>(headers);
+					System.out.println(fullUrl);
+					// Hacer la solicitud GET al servicio externo
+
+					// Obtener la respuesta del servicio externo
+					response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+					return response;
+				}
+				default -> {
+					return new ResponseEntity<>("El idFormaCanonica " + idFormaCanonica + " no es valido para el geocoder seleccionado.", headers, HttpStatus.BAD_REQUEST);
+				}
+			}
+
+
+
+
+
+
+
+		}
+		return new ResponseEntity<>("IDGEOCODER INVALIDO", headers, HttpStatus.BAD_REQUEST);
+	}
+
+	@GetMapping("/sugerenciaCalleCompleta")
+	@CrossOrigin(origins = "*") // Permitir todas las IPs
+	public ResponseEntity<String> sugerenciaCalleCompleta(@RequestParam(value = "entrada", required = true) String entrada, @RequestParam(value = "todos", required = false) Boolean todos) throws JsonProcessingException {
+		RestTemplate restTemplate = new RestTemplate();
+
+		// Configurar los encabezados de la solicitud
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		// Agregar otros encabezados si es necesario
+
+		// Construir los parámetros
+		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+		params.add("entrada", entrada);
+		if (todos != null) {
+			params.add("todos", todos.toString());
+		}
+		// Construir la URL con los parámetros
+		String url = "https://direcciones.ide.uy/api/v0/geocode/SugerenciaCalleCompleta";
+		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url)
+				.queryParams(params);
+		String fullUrl = builder.toUriString();
+
+		// Crear una entidad HttpEntity con los encabezados
+		HttpEntity<String> entity = new HttpEntity<>(headers);
+
+		// Obtener la respuesta del servicio externo
+		ResponseEntity<String> response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+		insertarEnBase(response, "SUGERENCIACALLECOMPLETA");
+
+		return response;
 
 	}
 
 
 
-	@GetMapping("/busquedaDireccion/{calle}")
+	/*@GetMapping("/busquedaDireccion/{calle}")
 	@CrossOrigin(origins = "*") // Permitir todas las IPs
 	public ResponseEntity<String> busquedaDireccion(@PathVariable("calle") String calle, @RequestParam(value = "departamento", required = false) String departamento, @RequestParam(value = "localidad", required = false) String localidad) throws JsonProcessingException {
 		RestTemplate restTemplate = new RestTemplate();
@@ -284,7 +367,6 @@ class DireccionesController {
 		// Configurar los encabezados de la solicitud
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.add("Access-Control-Allow-Origin", "*");
 		// Agregar otros encabezados si es necesario
 
 		// Construir los parámetros
@@ -324,7 +406,6 @@ class DireccionesController {
 		// Configurar los encabezados de la solicitud
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.add("Access-Control-Allow-Origin", "*");
 		// Agregar otros encabezados si es necesario
 
 		// Construir los parámetros
@@ -359,7 +440,6 @@ class DireccionesController {
 		// Configurar los encabezados de la solicitud
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.add("Access-Control-Allow-Origin", "*");
 		// Agregar otros encabezados si es necesario
 
 		// Construir los parámetros
@@ -396,7 +476,6 @@ class DireccionesController {
 		// Configurar los encabezados de la solicitud
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.add("Access-Control-Allow-Origin", "*");
 		// Agregar otros encabezados si es necesario
 
 		// Construir los parámetros
@@ -422,41 +501,6 @@ class DireccionesController {
 
 	}
 
-	@GetMapping("/sugerenciaCalleCompleta")
-	@CrossOrigin(origins = "*") // Permitir todas las IPs
-	public ResponseEntity<String> sugerenciaCalleCompleta(@RequestParam(value = "entrada", required = true) String entrada, @RequestParam(value = "todos", required = false) Boolean todos) throws JsonProcessingException {
-		RestTemplate restTemplate = new RestTemplate();
-
-		// Configurar los encabezados de la solicitud
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.add("Access-Control-Allow-Origin", "*");
-		// Agregar otros encabezados si es necesario
-
-		// Construir los parámetros
-		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-		params.add("entrada", entrada);
-		if (todos != null) {
-			params.add("todos", todos.toString());
-		}
-		// Construir la URL con los parámetros
-		String url = "https://direcciones.ide.uy/api/v0/geocode/SugerenciaCalleCompleta";
-		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url)
-				.queryParams(params);
-		String fullUrl = builder.toUriString();
-
-		// Crear una entidad HttpEntity con los encabezados
-		HttpEntity<String> entity = new HttpEntity<>(headers);
-
-		// Obtener la respuesta del servicio externo
-		ResponseEntity<String> response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
-
-		insertarEnBase(response, "SUGERENCIACALLECOMPLETA");
-
-		return response;
-
-	}
-
 	@GetMapping("/find")
 	@CrossOrigin(origins = "*") // Permitir todas las IPs
 	public ResponseEntity<String> find(@RequestParam(value = "type", required = true) String type,
@@ -477,7 +521,6 @@ class DireccionesController {
 		// Configurar los encabezados de la solicitud
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.add("Access-Control-Allow-Origin", "*");
 		// Agregar otros encabezados si es necesario
 
 		// Construir los parámetros
@@ -535,46 +578,37 @@ class DireccionesController {
 	}
 
 	@GetMapping("/direcEnPoligono")
-	@CrossOrigin(origins = "*") // Permitir todas las IPs
-	public ResponseEntity<String> direcEnPoligono(@RequestParam(value = "limit", required = false) Integer limit, @RequestParam(value = "poligono", required = true) String poligono, @RequestParam(value = "tipoDirec", required = false) String tipoDirec) throws JsonProcessingException {
-		RestTemplate restTemplate = new RestTemplate();
+	@CrossOrigin(origins = "*")
+	public ResponseEntity<String> direcEnPoligono(
+			@RequestParam(value = "limit", required = false) Integer limit,
+			@RequestParam(value = "poligono") String poligono,
+			@RequestParam(value = "tipoDirec", required = false) String tipoDirec
+	) {
+		WebClient webClient = WebClient.builder()
+				.baseUrl("https://direcciones.ide.uy/api/v1/geocode")
+				.defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+				.defaultHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "*")
+				.build();
 
-		// Configurar los encabezados de la solicitud
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.add("Access-Control-Allow-Origin", "*");
-		// Agregar otros encabezados si es necesario
+		UriBuilder uriBuilder = UriComponentsBuilder.fromPath("/direcEnPoligono")
+				.queryParam("poligono", poligono);
 
-		// Construir los parámetros
-		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-		params.add("poligono", poligono);
 		if (limit != null) {
-			params.add("limit", limit.toString());
+			uriBuilder.queryParam("limit", limit);
 		}
 		if (tipoDirec != null) {
-			params.add("tipoDirec", tipoDirec);
+			uriBuilder.queryParam("tipoDirec", tipoDirec);
 		}
 
-		// Construir la URL con los parámetros
-		String url = "https://direcciones.ide.uy/api/v1/geocode/direcEnPoligono";
-		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url)
-				.queryParams(params);
-		String fullUrl = builder.toUriString();
+		String uri = uriBuilder.build().toString();
 
-		// Crear una entidad HttpEntity con los encabezados
-		HttpEntity<String> entity = new HttpEntity<>(headers);
+		Mono<String> responseMono = webClient.get()
+				.uri(uri)
+				.retrieve()
+				.bodyToMono(String.class);
 
-		// Obtener la respuesta del servicio externo
-		try {
-			System.out.println(poligono);
-			ResponseEntity<String> response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
-			insertarEnBase(response, "DIRECENPOLIGONO");
-			return response;
-		} catch (RestClientException e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-		}
-		return null;
-	}
+		String response = responseMono.block(); // Bloquea y espera la respuesta
 
+		return ResponseEntity.ok(response);
+	}*/
 }
