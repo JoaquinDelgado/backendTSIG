@@ -5,9 +5,9 @@ services:
     image: postgres
     container_name: postgres
     environment:
-      POSTGRES_USER: tsig
-      POSTGRES_PASSWORD: tsig
-      POSTGRES_DB: tsig_2023
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: tsig
     volumes:
       - ./data:/var/lib/postgresql/data
       - ./scripts:/docker-entrypoint-initdb.d
