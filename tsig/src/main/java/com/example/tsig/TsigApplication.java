@@ -20,11 +20,15 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import reactor.core.publisher.Mono;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,16 +48,6 @@ class DireccionesController {
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
-
-	void insertarEnBase(ResponseEntity<String> response, String servicio) throws JsonProcessingException {
-		String sql = "INSERT INTO json_response (json, geocoder, servicio) VALUES (to_jsonb(?::text), 'AGESIC', ?)";
-		ObjectMapper objectMapper = new ObjectMapper();
-		String responseBody = objectMapper.writeValueAsString(response.getBody());
-		int rows = jdbcTemplate.update(sql, responseBody, servicio);
-		if (rows > 0) {
-			System.out.println("A new row has been inserted.");
-		}
-	}
 
 	public void insertarCoordenadas(String input, String geoCoder, Double lat, Double lon){
 		String sql = "INSERT INTO audits (input,geocoder,latitud,longitud) VALUES (?,?,?,?)";
@@ -157,8 +151,6 @@ class DireccionesController {
 					params.add("localidad", localidad);
 					params.add("departamento", departamento);
 
-					String input = calleGeoCoder + (localidad!="" ? ";"+localidad : "");
-					input = input + (departamento!="" ? ";"+departamento : "");
 					builder = UriComponentsBuilder.fromHttpUrl(url)
 							.queryParams(params);
 					fullUrl = builder.toUriString();
@@ -172,16 +164,14 @@ class DireccionesController {
 					// Obtener la respuesta del servicio externo
 					response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
 
+					String input = "calleGeoCoder:"+calleGeoCoder + (localidad!="" ? ";localidad:"+localidad : "");
+					input = input + (departamento!="" ? ";departamento:"+departamento : "");
 					// Obtener la respuesta de ResponseEntity
 					String jsonString = response.getBody();
-
-					// Crear un ObjectMapper de Jackson
 					// Crear un ObjectMapper de Jackson
 					ObjectMapper objectMapper = new ObjectMapper();
-
 					// Analizar la cadena de texto JSON en una lista de objetos Java
 					List<Map<String, Object>> listaObjetos = objectMapper.readValue(jsonString, new TypeReference<List<Map<String, Object>>>() {});
-
 					// Recorrer la lista de objetos
 					for (Map<String, Object> objeto : listaObjetos) {
 						// Acceder a los atributos de cada objeto
@@ -220,6 +210,28 @@ class DireccionesController {
 
 					// Obtener la respuesta del servicio externo
 					response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+
+					input = "calleGeoCoder:"+calleGeoCoder + (localidad!="" ? ";localidad:"+localidad : "");
+					input = input + (departamento!="" ? ";departamento:"+departamento : "");
+					// Obtener la respuesta de ResponseEntity
+					jsonString = response.getBody();
+					// Crear un ObjectMapper de Jackson
+					objectMapper = new ObjectMapper();
+					// Analizar la cadena de texto JSON en una lista de objetos Java
+					listaObjetos = objectMapper.readValue(jsonString, new TypeReference<List<Map<String, Object>>>() {});
+					// Recorrer la lista de objetos
+					for (Map<String, Object> objeto : listaObjetos) {
+						// Acceder a los atributos de cada objeto
+						String error = (String)objeto.get("error");
+						Double lon = (Double) objeto.get("puntoX");
+						Double lat = (Double) objeto.get("puntoY");
+						if(error.isEmpty()){
+							System.out.println("Long: " + lon);
+							System.out.println("lat: " + lat);
+							insertarCoordenadas(input, "IDE", lat, lon);
+						}
+					}
+
 					return response;
 				case 3:
 					if (departamento == null) {
@@ -255,6 +267,29 @@ class DireccionesController {
 
 					// Obtener la respuesta del servicio externo
 					response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+
+					input = "calleGeoCoder:"+calleGeoCoder + (localidad!="" ? ";localidad:"+localidad : "");
+					input = input + (departamento!="" ? ";departamento:"+departamento : "");
+					// Obtener la respuesta de ResponseEntity
+					jsonString = response.getBody();
+					// Crear un ObjectMapper de Jackson
+					objectMapper = new ObjectMapper();
+					// Analizar la cadena de texto JSON en una lista de objetos Java
+					listaObjetos = objectMapper.readValue(jsonString, new TypeReference<List<Map<String, Object>>>() {});
+					// Recorrer la lista de objetos
+					for (Map<String, Object> objeto : listaObjetos) {
+						// Acceder a los atributos de cada objeto
+						String error = (String)objeto.get("error");
+						Double lon = (Double) objeto.get("puntoX");
+						Double lat = (Double) objeto.get("puntoY");
+						if(error.isEmpty()){
+							System.out.println("Long: " + lon);
+							System.out.println("lat: " + lat);
+							insertarCoordenadas(input, "IDE", lat, lon);
+						}
+					}
+
+
 					return response;
 				case 4:
 					if (nombreInmueble == null) {
@@ -271,13 +306,33 @@ class DireccionesController {
 
 					// Crear una entidad HttpEntity con los encabezados
 					entity = new HttpEntity<>(headers);
-
-					// Hacer la solicitud GET al servicio externo
-
 					// Obtener la respuesta del servicio externo
 					response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+
+					input = "nombreInmueble:"+nombreInmueble + (localidad!="" ? ";localidad:"+localidad : "");
+					input = input + (departamento!="" ? ";departamento:"+departamento : "");
+					// Obtener la respuesta de ResponseEntity
+					jsonString = response.getBody();
+					// Crear un ObjectMapper de Jackson
+					objectMapper = new ObjectMapper();
+					// Analizar la cadena de texto JSON en una lista de objetos Java
+					listaObjetos = objectMapper.readValue(jsonString, new TypeReference<List<Map<String, Object>>>() {});
+					// Recorrer la lista de objetos
+					for (Map<String, Object> objeto : listaObjetos) {
+						// Acceder a los atributos de cada objeto
+						String error = (String)objeto.get("error");
+						Double lon = (Double) objeto.get("puntoX");
+						Double lat = (Double) objeto.get("puntoY");
+						if(error.isEmpty()){
+							System.out.println("Long: " + lon);
+							System.out.println("lat: " + lat);
+							insertarCoordenadas(input, "IDE", lat, lon);
+						}
+					}
+
 					return response;
 				case 5:
+					System.out.println("Entro....");
 					if (numeroRuta == null) {
 						return new ResponseEntity<String>("numeroRuta no puede ser vacio", headers,
 								HttpStatus.BAD_REQUEST);
@@ -301,7 +356,25 @@ class DireccionesController {
 					// Obtener la respuesta del servicio externo
 					response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
 
-					insertarEnBase(response, "RUTAKM");
+					input = "numeroRuta:"+numeroRuta.toString()+";kilometro:"+kilometro;
+					// Obtener la respuesta de ResponseEntity
+					jsonString = response.getBody();
+					// Crear un ObjectMapper de Jackson
+					objectMapper = new ObjectMapper();
+					// Analizar la cadena de texto JSON en una lista de objetos Java
+					listaObjetos = objectMapper.readValue(jsonString, new TypeReference<List<Map<String, Object>>>() {});
+					// Recorrer la lista de objetos
+					for (Map<String, Object> objeto : listaObjetos) {
+						// Acceder a los atributos de cada objeto
+						Double lon = (Double) objeto.get("lng");
+						Double lat = (Double) objeto.get("lat");
+						System.out.println("Long: " + lon);
+						System.out.println("lat: " + lat);
+						insertarCoordenadas(input, "IDE", lat, lon);
+					}
+
+
+					//insertarEnBase(response, "RUTAKM");
 					return response;
 				default:
 					return new ResponseEntity<>("IDFORMACANONICA INVALIDO", headers, HttpStatus.BAD_REQUEST);
@@ -331,6 +404,26 @@ class DireccionesController {
 
 					// Obtener la respuesta del servicio externo
 					response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+
+					String input = "calle:"+calle + ";numero:"+numero;
+					// Obtener la respuesta de ResponseEntity
+					String jsonString = response.getBody();
+					// Crear un ObjectMapper de Jackson
+					ObjectMapper objectMapper = new ObjectMapper();
+					// Analizar la cadena de texto JSON en una lista de objetos Java
+					List<Map<String, Object>> listaObjetos = objectMapper.readValue(jsonString, new TypeReference<List<Map<String, Object>>>() {});
+					// Recorrer la lista de objetos
+					for (Map<String, Object> objeto : listaObjetos) {
+						// Acceder a los atributos de cada objeto
+						Double lon = Double.parseDouble((String)objeto.get("lon"));
+						Double lat = Double.parseDouble((String)objeto.get("lat"));
+						System.out.println("log: " + lon);
+						System.out.println("lat: " + lat);
+						insertarCoordenadas(input, "NOMINATIN", lat, lon);
+						
+					}
+
+
 					return response;
 				}
 				case 4 -> {
@@ -350,6 +443,27 @@ class DireccionesController {
 
 					// Obtener la respuesta del servicio externo
 					response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+
+					String input = "nombreInmueble:"+nombreInmueble + (localidad!="" ? ";localidad:"+localidad : "");
+					input = input + (departamento!="" ? ";departamento:"+departamento : "");
+					// Obtener la respuesta de ResponseEntity
+					String jsonString = response.getBody();
+					// Crear un ObjectMapper de Jackson
+					ObjectMapper objectMapper = new ObjectMapper();
+					// Analizar la cadena de texto JSON en una lista de objetos Java
+					List<Map<String, Object>> listaObjetos = objectMapper.readValue(jsonString, new TypeReference<List<Map<String, Object>>>() {});
+					// Recorrer la lista de objetos
+					for (Map<String, Object> objeto : listaObjetos) {
+						// Acceder a los atributos de cada objeto
+						Double lon = Double.parseDouble((String)objeto.get("lon"));
+						Double lat = Double.parseDouble((String)objeto.get("lat"));
+						System.out.println("log: " + lon);
+						System.out.println("lat: " + lat);
+						insertarCoordenadas(input, "NOMINATIN", lat, lon);
+						
+					}
+
+
 					return response;
 				}
 				default -> {
@@ -359,6 +473,58 @@ class DireccionesController {
 				}
 			}
 
+		}
+		if (idGeoCoder == 3) {
+			{
+				String url = "https://photon.komoot.io/api/";
+				UriComponentsBuilder builder;
+				String fullUrl;
+				HttpEntity<String> entity;
+				ResponseEntity<String> response;
+				switch (idFormaCanonica) {
+					case 6 -> {
+						// Construir la URL con los parámetros
+						calle = Utils.RemplazarTildesYEspacios(calle);
+						params.add("q", calle + "+" + numero);
+						builder = UriComponentsBuilder.fromHttpUrl(url)
+								.queryParams(params);
+						fullUrl = builder.toUriString();
+
+						// Crear una entidad HttpEntity con los encabezados
+						entity = new HttpEntity<>(headers);
+						System.out.println(fullUrl);
+						// Hacer la solicitud GET al servicio externo
+
+						// Obtener la respuesta del servicio externo
+						response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+
+						String input = "calle:"+calle + ";numero:"+numero;
+						// Obtener la respuesta de ResponseEntity
+						String jsonString = response.getBody();
+						// Crear un ObjectMapper de Jackson
+						ObjectMapper objectMapper = new ObjectMapper();
+						// Analizar la cadena de texto JSON en un objeto Java
+						Map<String, Object> objeto = objectMapper.readValue(jsonString, new TypeReference<>() {
+						});
+
+						// Acceder a los valores del objeto
+						List<Map<String, Object>> listaObjetos = (List<Map<String, Object>>) objeto.get("features");
+						Map<String,Object> primerObjeto = listaObjetos.get(0);
+						Map<String, Object> geometry = (Map<String, Object>) primerObjeto.get("geometry");
+						List<Double> coordenadas = (List<Double>) geometry.get("coordinates");
+						Double latitud = coordenadas.get(1);
+						Double longitud = coordenadas.get(0);
+						insertarCoordenadas(input, "PHOTON", latitud, longitud);
+						return response;
+					}
+					default -> {
+						return new ResponseEntity<>(
+								"El idFormaCanonica " + idFormaCanonica + " no es valido para el geocoder seleccionado.",
+								headers, HttpStatus.BAD_REQUEST);
+					}
+				}
+
+			}
 		}
 		return new ResponseEntity<>("IDGEOCODER INVALIDO", headers, HttpStatus.BAD_REQUEST);
 	}
@@ -392,301 +558,40 @@ class DireccionesController {
 
 		// Obtener la respuesta del servicio externo
 		ResponseEntity<String> response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
-		insertarEnBase(response, "SUGERENCIACALLECOMPLETA");
-
 		return response;
 
 	}
 
-	/*
-	 * @GetMapping("/busquedaDireccion/{calle}")
-	 * 
-	 * @CrossOrigin(origins = "*") // Permitir todas las IPs
-	 * public ResponseEntity<String> busquedaDireccion(@PathVariable("calle") String
-	 * calle, @RequestParam(value = "departamento", required = false) String
-	 * departamento, @RequestParam(value = "localidad", required = false) String
-	 * localidad) throws JsonProcessingException {
-	 * RestTemplate restTemplate = new RestTemplate();
-	 * 
-	 * // Configurar los encabezados de la solicitud
-	 * HttpHeaders headers = new HttpHeaders();
-	 * headers.setContentType(MediaType.APPLICATION_JSON);
-	 * // Agregar otros encabezados si es necesario
-	 * 
-	 * // Construir los parámetros
-	 * MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-	 * params.add("calle", calle);
-	 * if (departamento != null) {
-	 * params.add("departamento", departamento);
-	 * }
-	 * if (localidad != null) {
-	 * params.add("localidad", localidad);
-	 * }
-	 * 
-	 * // Construir la URL con los parámetros
-	 * String url = "https://direcciones.ide.uy/api/v0/geocode/BusquedaDireccion";
-	 * UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url)
-	 * .queryParams(params);
-	 * String fullUrl = builder.toUriString();
-	 * 
-	 * // Crear una entidad HttpEntity con los encabezados
-	 * HttpEntity<String> entity = new HttpEntity<>(headers);
-	 * 
-	 * // Hacer la solicitud GET al servicio externo
-	 * 
-	 * // Obtener la respuesta del servicio externo
-	 * ResponseEntity<String> response = restTemplate.exchange(fullUrl,
-	 * HttpMethod.GET, entity, String.class);
-	 * 
-	 * insertarEnBase(response, "BUSQUEDADIRECCION");
-	 * 
-	 * return response;
-	 * }
-	 * 
-	 * @GetMapping("/localidades/{departamento}")
-	 * 
-	 * @CrossOrigin(origins = "*") // Permitir todas las IPs
-	 * public ResponseEntity<String> localidades(@PathVariable("departamento")
-	 * String departamento, @RequestParam(value = "alias", required = false) Boolean
-	 * alias) throws JsonProcessingException {
-	 * RestTemplate restTemplate = new RestTemplate();
-	 * 
-	 * // Configurar los encabezados de la solicitud
-	 * HttpHeaders headers = new HttpHeaders();
-	 * headers.setContentType(MediaType.APPLICATION_JSON);
-	 * // Agregar otros encabezados si es necesario
-	 * 
-	 * // Construir los parámetros
-	 * MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-	 * params.add("departamento", departamento);
-	 * if (alias != null) {
-	 * params.add("alias", alias.toString());
-	 * }
-	 * 
-	 * // Construir la URL con los parámetros
-	 * String url = "https://direcciones.ide.uy/api/v0/geocode/localidades";
-	 * UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url)
-	 * .queryParams(params);
-	 * String fullUrl = builder.toUriString();
-	 * 
-	 * // Crear una entidad HttpEntity con los encabezados
-	 * HttpEntity<String> entity = new HttpEntity<>(headers);
-	 * 
-	 * // Obtener la respuesta del servicio externo
-	 * ResponseEntity<String> response = restTemplate.exchange(fullUrl,
-	 * HttpMethod.GET, entity, String.class);
-	 * 
-	 * insertarEnBase(response, "LOCALIDADES");
-	 * 
-	 * return response;
-	 * }
-	 * 
-	 * @GetMapping("/reverse")
-	 * 
-	 * @CrossOrigin(origins = "*") // Permitir todas las IPs
-	 * public ResponseEntity<String> reverse(@RequestParam(value = "latitud",
-	 * required = true) Double latitud, @RequestParam(value = "longitud", required =
-	 * true) Double longitud, @RequestParam(value = "limit", required = false)
-	 * Integer limit) throws JsonProcessingException {
-	 * RestTemplate restTemplate = new RestTemplate();
-	 * 
-	 * // Configurar los encabezados de la solicitud
-	 * HttpHeaders headers = new HttpHeaders();
-	 * headers.setContentType(MediaType.APPLICATION_JSON);
-	 * // Agregar otros encabezados si es necesario
-	 * 
-	 * // Construir los parámetros
-	 * MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-	 * params.add("latitud", latitud.toString());
-	 * params.add("longitud", longitud.toString());
-	 * if (limit != null) {
-	 * params.add("limit", limit.toString());
-	 * }
-	 * 
-	 * // Construir la URL con los parámetros
-	 * String url = "https://direcciones.ide.uy/api/v1/geocode/reverse";
-	 * UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url)
-	 * .queryParams(params);
-	 * String fullUrl = builder.toUriString();
-	 * 
-	 * // Crear una entidad HttpEntity con los encabezados
-	 * HttpEntity<String> entity = new HttpEntity<>(headers);
-	 * 
-	 * // Obtener la respuesta del servicio externo
-	 * ResponseEntity<String> response = restTemplate.exchange(fullUrl,
-	 * HttpMethod.GET, entity, String.class);
-	 * 
-	 * insertarEnBase(response, "REVERSE");
-	 * 
-	 * return response;
-	 * 
-	 * }
-	 * 
-	 * @GetMapping("/rutakm")
-	 * 
-	 * @CrossOrigin(origins = "*") // Permitir todas las IPs
-	 * public ResponseEntity<String> rutakm(@RequestParam(value = "km", required =
-	 * true) Double km, @RequestParam(value = "ruta", required = true) String ruta)
-	 * throws JsonProcessingException {
-	 * RestTemplate restTemplate = new RestTemplate();
-	 * 
-	 * // Configurar los encabezados de la solicitud
-	 * HttpHeaders headers = new HttpHeaders();
-	 * headers.setContentType(MediaType.APPLICATION_JSON);
-	 * // Agregar otros encabezados si es necesario
-	 * 
-	 * // Construir los parámetros
-	 * MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-	 * params.add("km", km.toString());
-	 * params.add("ruta", ruta.toString());
-	 * 
-	 * // Construir la URL con los parámetros
-	 * String url = "https://direcciones.ide.uy/api/v1/geocode/rutakm";
-	 * UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url)
-	 * .queryParams(params);
-	 * String fullUrl = builder.toUriString();
-	 * 
-	 * // Crear una entidad HttpEntity con los encabezados
-	 * HttpEntity<String> entity = new HttpEntity<>(headers);
-	 * 
-	 * // Obtener la respuesta del servicio externo
-	 * ResponseEntity<String> response = restTemplate.exchange(fullUrl,
-	 * HttpMethod.GET, entity, String.class);
-	 * 
-	 * insertarEnBase(response, "RUTAKM");
-	 * 
-	 * return response;
-	 * 
-	 * }
-	 * 
-	 * @GetMapping("/find")
-	 * 
-	 * @CrossOrigin(origins = "*") // Permitir todas las IPs
-	 * public ResponseEntity<String> find(@RequestParam(value = "type", required =
-	 * true) String type,
-	 * 
-	 * @RequestParam(value = "departamento", required = false) String departamento,
-	 * 
-	 * @RequestParam(value = "idcalle", required = false) String idcalle,
-	 * 
-	 * @RequestParam(value = "idcalleEsq", required = false) String idcalleEsq,
-	 * 
-	 * @RequestParam(value = "inmueble", required = false) String inmueble,
-	 * 
-	 * @RequestParam(value = "km", required = false) String km,
-	 * 
-	 * @RequestParam(value = "letra", required = false) String letra,
-	 * 
-	 * @RequestParam(value = "localidad", required = false) String localidad,
-	 * 
-	 * @RequestParam(value = "manzana", required = false) String manzana,
-	 * 
-	 * @RequestParam(value = "portal", required = false) String portal,
-	 * 
-	 * @RequestParam(value = "ruta", required = false) String ruta,
-	 * 
-	 * @RequestParam(value = "solar", required = false) String solar) throws
-	 * JsonProcessingException {
-	 * 
-	 * RestTemplate restTemplate = new RestTemplate();
-	 * 
-	 * // Configurar los encabezados de la solicitud
-	 * HttpHeaders headers = new HttpHeaders();
-	 * headers.setContentType(MediaType.APPLICATION_JSON);
-	 * // Agregar otros encabezados si es necesario
-	 * 
-	 * // Construir los parámetros
-	 * MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-	 * params.add("type", type);
-	 * if (departamento != null) {
-	 * params.add("departamento", departamento);
-	 * }
-	 * if (idcalle != null) {
-	 * params.add("idcalle", idcalle);
-	 * }
-	 * if (idcalleEsq != null) {
-	 * params.add("idcalleEsq", idcalleEsq);
-	 * }
-	 * if (inmueble != null) {
-	 * params.add("inmueble", inmueble);
-	 * }
-	 * if (km != null) {
-	 * params.add("km", km);
-	 * }
-	 * if (letra != null) {
-	 * params.add("letra", letra);
-	 * }
-	 * if (localidad != null) {
-	 * params.add("localidad", localidad);
-	 * }
-	 * if (manzana != null) {
-	 * params.add("manzana", manzana);
-	 * }
-	 * if (portal != null) {
-	 * params.add("portal", portal);
-	 * }
-	 * if (ruta != null) {
-	 * params.add("ruta", ruta);
-	 * }
-	 * if (solar != null) {
-	 * params.add("solar", solar);
-	 * }
-	 * // Construir la URL con los parámetros
-	 * String url = "https://direcciones.ide.uy/api/v1/geocode/find";
-	 * UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url)
-	 * .queryParams(params);
-	 * String fullUrl = builder.toUriString();
-	 * 
-	 * // Crear una entidad HttpEntity con los encabezados
-	 * HttpEntity<String> entity = new HttpEntity<>(headers);
-	 * 
-	 * // Obtener la respuesta del servicio externo
-	 * ResponseEntity<String> response = restTemplate.exchange(fullUrl,
-	 * HttpMethod.GET, entity, String.class);
-	 * 
-	 * insertarEnBase(response, "FIND");
-	 * 
-	 * return response;
-	 * 
-	 * }
-	 * 
-	 * @GetMapping("/direcEnPoligono")
-	 * 
-	 * @CrossOrigin(origins = "*")
-	 * public ResponseEntity<String> direcEnPoligono(
-	 * 
-	 * @RequestParam(value = "limit", required = false) Integer limit,
-	 * 
-	 * @RequestParam(value = "poligono") String poligono,
-	 * 
-	 * @RequestParam(value = "tipoDirec", required = false) String tipoDirec
-	 * ) {
-	 * WebClient webClient = WebClient.builder()
-	 * .baseUrl("https://direcciones.ide.uy/api/v1/geocode")
-	 * .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-	 * .defaultHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "*")
-	 * .build();
-	 * 
-	 * UriBuilder uriBuilder = UriComponentsBuilder.fromPath("/direcEnPoligono")
-	 * .queryParam("poligono", poligono);
-	 * 
-	 * if (limit != null) {
-	 * uriBuilder.queryParam("limit", limit);
-	 * }
-	 * if (tipoDirec != null) {
-	 * uriBuilder.queryParam("tipoDirec", tipoDirec);
-	 * }
-	 * 
-	 * String uri = uriBuilder.build().toString();
-	 * 
-	 * Mono<String> responseMono = webClient.get()
-	 * .uri(uri)
-	 * .retrieve()
-	 * .bodyToMono(String.class);
-	 * 
-	 * String response = responseMono.block(); // Bloquea y espera la respuesta
-	 * 
-	 * return ResponseEntity.ok(response);
-	 * }
-	 */
+	@GetMapping("/direcEnPoligono")
+	@CrossOrigin(origins = "*")
+	public ResponseEntity<String> direcEnPoligono(@RequestParam(value = "limit", required = false) Integer limit,
+												  @RequestParam(value = "poligono") String poligono,
+												  @RequestParam(value = "tipoDirec", required = false) String tipoDirec) {
+	  WebClient webClient = WebClient.builder()
+				.baseUrl("https://direcciones.ide.uy/api/v1/geocode")
+				 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+				 .defaultHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "*")
+				 .build();
+
+	  UriBuilder uriBuilder = UriComponentsBuilder.fromPath("/direcEnPoligono")
+				 .queryParam("poligono", poligono);
+
+	  if (limit != null) {
+	  uriBuilder.queryParam("limit", limit);
+	  }
+	  if (tipoDirec != null) {
+	  uriBuilder.queryParam("tipoDirec", tipoDirec);
+	  }
+
+	  String uri = uriBuilder.build().toString();
+
+	  Mono<String> responseMono = webClient.get()
+				 .uri(uri)
+				 .retrieve()
+				 .bodyToMono(String.class);
+
+	  String response = responseMono.block(); // Bloquea y espera la respuesta
+
+	  return ResponseEntity.ok(response);
+	}
 }
