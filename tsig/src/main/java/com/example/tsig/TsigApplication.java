@@ -419,7 +419,7 @@ class DireccionesController {
 						Double lat = Double.parseDouble((String)objeto.get("lat"));
 						System.out.println("log: " + lon);
 						System.out.println("lat: " + lat);
-						insertarCoordenadas(input, "NOMINATIN", lat, lon);
+						insertarCoordenadas(input, "NOMINATIM", lat, lon);
 						
 					}
 
@@ -457,13 +457,9 @@ class DireccionesController {
 						// Acceder a los atributos de cada objeto
 						Double lon = Double.parseDouble((String)objeto.get("lon"));
 						Double lat = Double.parseDouble((String)objeto.get("lat"));
-						System.out.println("log: " + lon);
-						System.out.println("lat: " + lat);
-						insertarCoordenadas(input, "NOMINATIN", lat, lon);
+						insertarCoordenadas(input, "NOMINATIM", lat, lon);
 						
 					}
-
-
 					return response;
 				}
 				default -> {
@@ -593,5 +589,48 @@ class DireccionesController {
 	  String response = responseMono.block(); // Bloquea y espera la respuesta
 
 	  return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/busquedaSimple")
+	@CrossOrigin(origins = "*") // Permitir todas las IPs
+	public ResponseEntity<String> busquedaSimple(
+			@RequestParam(value = "entrada", required = true) String entrada) throws JsonProcessingException {
+		RestTemplate restTemplate = new RestTemplate();
+
+		// Configurar los encabezados de la solicitud
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		// Agregar otros encabezados si es necesario
+
+		// Construir los parámetros
+		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+		String input = entrada;
+		entrada = Utils.RemplazarTildesYEspacios(entrada);
+		params.add("q", entrada);
+		params.add("format","json");
+		// Construir la URL con los parámetros
+		String url = "https://nominatim.openstreetmap.org/search";
+		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url)
+				.queryParams(params);
+		String fullUrl = builder.toUriString();
+
+		// Crear una entidad HttpEntity con los encabezados
+		HttpEntity<String> entity = new HttpEntity<>(headers);
+
+		// Obtener la respuesta del servicio externo
+		ResponseEntity<String> response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+		String jsonString = response.getBody();
+		// Crear un ObjectMapper de Jackson
+		ObjectMapper objectMapper = new ObjectMapper();
+		// Analizar la cadena de texto JSON en una lista de objetos Java
+		List<Map<String, Object>> listaObjetos = objectMapper.readValue(jsonString, new TypeReference<List<Map<String, Object>>>() {});
+		// Recorrer la lista de objetos
+		for (Map<String, Object> objeto : listaObjetos) {
+			// Acceder a los atributos de cada objeto
+			Double lon = Double.parseDouble((String)objeto.get("lon"));
+			Double lat = Double.parseDouble((String)objeto.get("lat"));
+			insertarCoordenadas(input, "NOMINATIM", lat, lon);
+		}
+		return response;
 	}
 }
