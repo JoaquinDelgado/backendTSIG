@@ -99,7 +99,7 @@ public class Service {
 					datos.put("localidad", localidad);
 					datos.put("departamento", departamento);
 					datos.put("response", jsonString);
-					tsigCache.insertarEnCahe(datos);
+					tsigCache.insertarEnCache(datos);
 
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
@@ -156,7 +156,7 @@ public class Service {
 					datos.put("localidad", localidad);
 					datos.put("departamento", departamento);
 					datos.put("response", jsonString);
-					tsigCache.insertarEnCahe(datos);
+					tsigCache.insertarEnCache(datos);
 
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
@@ -220,7 +220,7 @@ public class Service {
 					datos.put("localidad", localidad);
 					datos.put("departamento", departamento);
 					datos.put("response", jsonString);
-                    tsigCache.insertarEnCahe(datos);
+                    tsigCache.insertarEnCache(datos);
 
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
@@ -268,7 +268,7 @@ public class Service {
 					datos.put("localidad", localidad);
 					datos.put("departamento", departamento);
 					datos.put("response", jsonString);
-                    tsigCache.insertarEnCahe(datos);
+                    tsigCache.insertarEnCache(datos);
 
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
@@ -320,7 +320,7 @@ public class Service {
 					datos.put("id_canonic_form", "5");
 					datos.put("numeroruta", numeroRuta.toString());
 					datos.put("kilometro", kilometro.toString());
-                    tsigCache.insertarEnCahe(datos);
+                    tsigCache.insertarEnCache(datos);
 
 
                     // Crear un ObjectMapper de Jackson
@@ -377,7 +377,7 @@ public class Service {
 					datos.put("calle", calle);
 					datos.put("numero", numero);
 					datos.put("response", jsonString);
-                    tsigCache.insertarEnCahe(datos);
+                    tsigCache.insertarEnCache(datos);
 
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
@@ -423,7 +423,7 @@ public class Service {
 					datos.put("localidad", localidad);
 					datos.put("departamento", departamento);
 					datos.put("response", jsonString);
-                    tsigCache.insertarEnCahe(datos);
+                    tsigCache.insertarEnCache(datos);
 
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
@@ -478,7 +478,7 @@ public class Service {
                     datos.put("calle", calle);
                     datos.put("numero", numero);
                     datos.put("response", jsonString);
-                    tsigCache.insertarEnCahe(datos);
+                    tsigCache.insertarEnCache(datos);
 
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();

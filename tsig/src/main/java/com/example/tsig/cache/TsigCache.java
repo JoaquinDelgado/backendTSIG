@@ -15,7 +15,7 @@ public class TsigCache {
     @Autowired
     private Repository repository;
 
-    public void insertarEnCahe(Map<String,String> params) {
+    public void insertarEnCache(Map<String,String> params) {
         repository.insertarBusquedaEnCache(params);
     }
     
