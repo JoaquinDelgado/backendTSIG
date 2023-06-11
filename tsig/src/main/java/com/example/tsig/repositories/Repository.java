@@ -45,4 +45,38 @@ public class Repository {
         }
         return geoCoders;
     }
+
+    public void insertarBusquedaEnCache(Map<String,String> params) {
+
+        String queryInsertar = 
+        "INSERT INTO public.cache_busqueda "+
+            "(id_geocoder, id_canonic_form, calle, numero, localidad, departamento, calle2, manzana, solar, nombre_inmueble, numeroruta, kilometro, response, fecha_creado) "+
+            "VALUES "+
+            "(:id_geocoder, :id_canonic_form, :calle, :numero, :localidad, :departamento, :calle2, :manzana, :solar, :nombre_inmueble, :numeroruta, :kilometro, :response, CURRENT_TIMESTAMP) ";
+        String sql = reemplarParametrosQueryCacheBusqueda(queryInsertar, params);
+        System.out.println("sql: "+sql);
+        int rows = jdbcTemplate.update(sql);
+		if (rows > 0) {
+			System.out.println("A new row has been inserted.");
+		}
+    }
+
+
+    private String reemplarParametrosQueryCacheBusqueda(String query, Map<String,String> params){
+
+        String [] listaParametos= {"calle", "numero", "localidad", "departamento", "calle2", "manzana", "solar", "nombre_inmueble", "numeroruta", "kilometro", "response", "fecha_creado"};
+        query = query.replace(":id_geocoder",(String) params.get("id_geocoder"));
+        query = query.replace(":id_canonic_form",(String) params.get("id_canonic_form"));
+        for(int i=0;i<listaParametos.length;i++) {
+            String parametro = listaParametos[i];
+            String valor = (String) params.get(parametro);
+            if(valor==null) {
+                valor = "";
+            }   
+            query = query.replace(":"+parametro+",", "'"+valor.toUpperCase()+"',");
+        }
+        return query;
+
+
+    }
 }
