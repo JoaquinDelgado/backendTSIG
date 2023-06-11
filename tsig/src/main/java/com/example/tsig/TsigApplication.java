@@ -1,9 +1,11 @@
 package com.example.tsig;
 
 import com.example.tsig.utils.Utils;
+import com.example.tsig.repositories.Repository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,13 +25,10 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import reactor.core.publisher.Mono;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -47,60 +46,27 @@ public class TsigApplication {
 class DireccionesController {
 
 	@Autowired
-	private JdbcTemplate jdbcTemplate;
-
-	public void insertarCoordenadas(String input, String geoCoder, Double lat, Double lon){
-		String sql = "INSERT INTO audits (input,geocoder,latitud,longitud) VALUES (?,?,?,?)";
-		int rows = jdbcTemplate.update(sql, input, geoCoder, lat, lon);
-		if (rows > 0) {
-			System.out.println("A new row has been inserted.");
-		}
-
-	}
+	Repository repository;
 
 	@GetMapping("/formasCanonicas")
 	@CrossOrigin(origins = "*") // Permitir todas las IPs
 	public ResponseEntity<Map<Integer, String>> formasCanonicas() throws JsonProcessingException {
 
-		// Configurar los encabezados de la solicitud
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		// Agregar otros encabezados si es necesario
-
-		Map<Integer, String> formasCanonicas = new HashMap<>();
-
-		String sql = "SELECT * FROM canonic_forms";
-		List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
-
-		// Procesar los resultados
-		for (Map<String, Object> row : rows) {
-			formasCanonicas.put((Integer) row.get("id"), (String) row.get("canonic_form"));
-		}
-
+		Map<Integer, String> formasCanonicas = repository.obtenerFormasCanonicas();
 		return new ResponseEntity<>(formasCanonicas, headers, HttpStatus.OK);
 	}
 
 	@GetMapping("/obtenerGeoCoders")
 	@CrossOrigin(origins = "*") // Permitir todas las IPs
 	public ResponseEntity<Map<Integer, String>> obtenerGeoCoders(
-			@RequestParam(value = "idFormaCanonica", required = true) Integer idFormaCanonica)
-			throws JsonProcessingException {
+			@RequestParam(value = "idFormaCanonica") Integer idFormaCanonica) {
 
 		// Configurar los encabezados de la solicitud
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		// Agregar otros encabezados si es necesario
-
-		Map<Integer, String> geoCoders = new HashMap<>();
-
-		String sql = "SELECT g.ID, g.GEOCODER FROM GEOCODERS g INNER JOIN geocoders_canonic_forms gcf ON gcf.id_geocoder = g.id WHERE gcf.id_canonic_form = ?";
-		List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql, idFormaCanonica);
-
-		// Procesar los resultados
-		for (Map<String, Object> row : rows) {
-			geoCoders.put((Integer) row.get("id"), (String) row.get("geocoder"));
-		}
-
+		Map<Integer, String> geoCoders = repository.obtenerGeoCoders(idFormaCanonica);
 		return new ResponseEntity<>(geoCoders, headers, HttpStatus.OK);
 	}
 
@@ -154,8 +120,6 @@ class DireccionesController {
 					builder = UriComponentsBuilder.fromHttpUrl(url)
 							.queryParams(params);
 					fullUrl = builder.toUriString();
-
-					System.out.println(fullUrl);
 					// Crear una entidad HttpEntity con los encabezados
 					entity = new HttpEntity<>(headers);
 
@@ -179,12 +143,9 @@ class DireccionesController {
 						Double lon = (Double) objeto.get("puntoX");
 						Double lat = (Double) objeto.get("puntoY");
 						if(error.isEmpty()){
-							System.out.println("Long: " + lon);
-							System.out.println("lat: " + lat);
-							insertarCoordenadas(input, "IDE", lat, lon);
+							repository.insertarCoordenadas(input, "IDE", lat, lon);
 						}
 					}
-
 					return response;
 				case 2:
 					if (calle == null) {
@@ -226,12 +187,9 @@ class DireccionesController {
 						Double lon = (Double) objeto.get("puntoX");
 						Double lat = (Double) objeto.get("puntoY");
 						if(error.isEmpty()){
-							System.out.println("Long: " + lon);
-							System.out.println("lat: " + lat);
-							insertarCoordenadas(input, "IDE", lat, lon);
+							repository.insertarCoordenadas(input, "IDE", lat, lon);
 						}
 					}
-
 					return response;
 				case 3:
 					if (departamento == null) {
@@ -243,11 +201,11 @@ class DireccionesController {
 								HttpStatus.BAD_REQUEST);
 					}
 					if (manzana == null) {
-						return new ResponseEntity<String>("Manzana no puede ser vacio", headers,
+						return new ResponseEntity<>("Manzana no puede ser vacio", headers,
 								HttpStatus.BAD_REQUEST);
 					}
 					if (solar == null) {
-						return new ResponseEntity<String>("Solar no puede ser vacio", headers, HttpStatus.BAD_REQUEST);
+						return new ResponseEntity<>("Solar no puede ser vacio", headers, HttpStatus.BAD_REQUEST);
 					}
 					calleGeoCoder = calle != null ? calle + " " : "" + "manzana " + manzana + " solar " + solar;
 					System.out.println(calleGeoCoder);
@@ -283,13 +241,9 @@ class DireccionesController {
 						Double lon = (Double) objeto.get("puntoX");
 						Double lat = (Double) objeto.get("puntoY");
 						if(error.isEmpty()){
-							System.out.println("Long: " + lon);
-							System.out.println("lat: " + lat);
-							insertarCoordenadas(input, "IDE", lat, lon);
+							repository.insertarCoordenadas(input, "IDE", lat, lon);
 						}
 					}
-
-
 					return response;
 				case 4:
 					if (nombreInmueble == null) {
@@ -324,12 +278,9 @@ class DireccionesController {
 						Double lon = (Double) objeto.get("puntoX");
 						Double lat = (Double) objeto.get("puntoY");
 						if(error.isEmpty()){
-							System.out.println("Long: " + lon);
-							System.out.println("lat: " + lat);
-							insertarCoordenadas(input, "IDE", lat, lon);
+							repository.insertarCoordenadas(input, "IDE", lat, lon);
 						}
 					}
-
 					return response;
 				case 5:
 					System.out.println("Entro....");
@@ -368,13 +319,8 @@ class DireccionesController {
 						// Acceder a los atributos de cada objeto
 						Double lon = (Double) objeto.get("lng");
 						Double lat = (Double) objeto.get("lat");
-						System.out.println("Long: " + lon);
-						System.out.println("lat: " + lat);
-						insertarCoordenadas(input, "IDE", lat, lon);
+						repository.insertarCoordenadas(input, "IDE", lat, lon);
 					}
-
-
-					//insertarEnBase(response, "RUTAKM");
 					return response;
 				default:
 					return new ResponseEntity<>("IDFORMACANONICA INVALIDO", headers, HttpStatus.BAD_REQUEST);
@@ -417,13 +363,9 @@ class DireccionesController {
 						// Acceder a los atributos de cada objeto
 						Double lon = Double.parseDouble((String)objeto.get("lon"));
 						Double lat = Double.parseDouble((String)objeto.get("lat"));
-						System.out.println("log: " + lon);
-						System.out.println("lat: " + lat);
-						insertarCoordenadas(input, "NOMINATIM", lat, lon);
+						repository.insertarCoordenadas(input, "NOMINATIN", lat, lon);
 						
 					}
-
-
 					return response;
 				}
 				case 4 -> {
@@ -457,8 +399,7 @@ class DireccionesController {
 						// Acceder a los atributos de cada objeto
 						Double lon = Double.parseDouble((String)objeto.get("lon"));
 						Double lat = Double.parseDouble((String)objeto.get("lat"));
-						insertarCoordenadas(input, "NOMINATIM", lat, lon);
-						
+						repository.insertarCoordenadas(input, "NOMINATIN", lat, lon);
 					}
 					return response;
 				}
@@ -510,7 +451,7 @@ class DireccionesController {
 						List<Double> coordenadas = (List<Double>) geometry.get("coordinates");
 						Double latitud = coordenadas.get(1);
 						Double longitud = coordenadas.get(0);
-						insertarCoordenadas(input, "PHOTON", latitud, longitud);
+						repository.insertarCoordenadas(input, "PHOTON", latitud, longitud);
 						return response;
 					}
 					default -> {
@@ -528,8 +469,8 @@ class DireccionesController {
 	@GetMapping("/sugerenciaCalleCompleta")
 	@CrossOrigin(origins = "*") // Permitir todas las IPs
 	public ResponseEntity<String> sugerenciaCalleCompleta(
-			@RequestParam(value = "entrada", required = true) String entrada,
-			@RequestParam(value = "todos", required = false) Boolean todos) throws JsonProcessingException {
+			@RequestParam(value = "entrada") String entrada,
+			@RequestParam(value = "todos", required = false) Boolean todos) {
 		RestTemplate restTemplate = new RestTemplate();
 
 		// Configurar los encabezados de la solicitud
@@ -629,7 +570,7 @@ class DireccionesController {
 			// Acceder a los atributos de cada objeto
 			Double lon = Double.parseDouble((String)objeto.get("lon"));
 			Double lat = Double.parseDouble((String)objeto.get("lat"));
-			insertarCoordenadas(input, "NOMINATIM", lat, lon);
+			repository.insertarCoordenadas(input, "NOMINATIM", lat, lon);
 		}
 		return response;
 	}

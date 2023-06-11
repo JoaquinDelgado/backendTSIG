@@ -58,7 +58,8 @@ CONSTRAINT canonic_forms_pkey PRIMARY KEY (id)
 INSERT INTO public.geocoders(
 geocoder)
 VALUES ('IDE'),
-('NOMINATIM');
+('NOMINATIM'),
+('PHOTON');
 
 INSERT INTO public.canonic_forms(
 canonic_form)
@@ -86,4 +87,5 @@ VALUES (1, 1),
 (1, 5),
 (2, 6),
 (1, 6),
-(2, 4);
+(2, 4),
+(3, 6);
