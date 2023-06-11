@@ -20,6 +20,7 @@ import reactor.core.publisher.Mono;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Component
 public class Service {
@@ -56,15 +57,389 @@ public class Service {
         String input;
         List<Map<String, Object>> listaObjetos;
         ObjectMapper objectMapper;
+        String calleGeoCoder;
+        UriComponentsBuilder builder;
+        String fullUrl;
+        HttpEntity<String> entity;
+        ResponseEntity<String> response;
+        String url;
+        if (idGeoCoder == 0) {
+            switch (idFormaCanonica) {
+                case 1 -> {
+                    if (calle == null) {
+                        return new ResponseEntity<>("Calle no puede ser vacio", headers, HttpStatus.BAD_REQUEST);
+                    }
+                    calleGeoCoder = calle + (numero != null ? " " + numero : "");
 
+                    params.add("calle", calleGeoCoder);
+                    params.add("localidad", localidad);
+                    params.add("departamento", departamento);
+                    url = "https://direcciones.ide.uy/api/v0/geocode/BusquedaDireccion";
+                    builder = UriComponentsBuilder.fromHttpUrl(url)
+                            .queryParams(params);
+                    fullUrl = builder.toUriString();
+
+                    entity = new HttpEntity<>(headers);
+                    response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+                    input = "calleGeoCoder:" + calleGeoCoder + (!Objects.equals(localidad, "") ? ";localidad:" + localidad : "");
+                    input = input + (!Objects.equals(departamento, "") ? ";departamento:" + departamento : "");
+                    // Obtener la respuesta de ResponseEntity
+                    jsonString = response.getBody();
+                    // Crear un ObjectMapper de Jackson
+                    objectMapper = new ObjectMapper();
+                    // Analizar la cadena de texto JSON en una lista de objetos Java
+                    listaObjetos = objectMapper.readValue(jsonString, new TypeReference<>() {
+                    });
+                    // Recorrer la lista de objetos
+                    for (Map<String, Object> objeto : listaObjetos) {
+                        // Acceder a los atributos de cada objeto
+                        String error = (String) objeto.get("error");
+                        Double lon = (Double) objeto.get("puntoX");
+                        Double lat = (Double) objeto.get("puntoY");
+                        if (error.isEmpty()) {
+                            repository.insertarCoordenadas(input, "IDE", lat, lon);
+                        }
+                    }
+                    return response;
+                }
+                case 2 -> {
+                    if (calle == null) {
+                        return new ResponseEntity<>("Calle no puede ser vacio", headers, HttpStatus.BAD_REQUEST);
+                    }
+                    if (calle2 == null) {
+                        return new ResponseEntity<>("Calle2 no puede ser vacio", headers, HttpStatus.BAD_REQUEST);
+                    }
+                    calleGeoCoder = calle + (numero != null ? " " + numero : "") + " esquina " + calle2;
+                    // Construir la URL con los parámetros
+                    params.add("calle", calleGeoCoder);
+                    params.add("localidad", localidad);
+                    params.add("departamento", departamento);
+                    url = "https://direcciones.ide.uy/api/v0/geocode/BusquedaDireccion";
+                    builder = UriComponentsBuilder.fromHttpUrl(url)
+                            .queryParams(params);
+                    fullUrl = builder.toUriString();
+
+                    // Crear una entidad HttpEntity con los encabezados
+                    entity = new HttpEntity<>(headers);
+
+                    // Hacer la solicitud GET al servicio externo
+
+                    // Obtener la respuesta del servicio externo
+                    response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+                    input = "calleGeoCoder:" + calleGeoCoder + (!Objects.equals(localidad, "") ? ";localidad:" + localidad : "");
+                    input = input + (!Objects.equals(departamento, "") ? ";departamento:" + departamento : "");
+                    // Obtener la respuesta de ResponseEntity
+                    jsonString = response.getBody();
+                    // Crear un ObjectMapper de Jackson
+                    objectMapper = new ObjectMapper();
+                    // Analizar la cadena de texto JSON en una lista de objetos Java
+                    listaObjetos = objectMapper.readValue(jsonString, new TypeReference<>() {
+                    });
+                    // Recorrer la lista de objetos
+                    for (Map<String, Object> objeto : listaObjetos) {
+                        // Acceder a los atributos de cada objeto
+                        String error = (String) objeto.get("error");
+                        Double lon = (Double) objeto.get("puntoX");
+                        Double lat = (Double) objeto.get("puntoY");
+                        if (error.isEmpty()) {
+                            repository.insertarCoordenadas(input, "IDE", lat, lon);
+                        }
+                    }
+                    return response;
+                }
+                case 3 -> {
+                    if (departamento == null) {
+                        return new ResponseEntity<String>("Departamento no puede ser vacio", headers,
+                                HttpStatus.BAD_REQUEST);
+                    }
+                    if (localidad == null) {
+                        return new ResponseEntity<String>("Localidad no puede ser vacio", headers,
+                                HttpStatus.BAD_REQUEST);
+                    }
+                    if (manzana == null) {
+                        return new ResponseEntity<>("Manzana no puede ser vacio", headers,
+                                HttpStatus.BAD_REQUEST);
+                    }
+                    if (solar == null) {
+                        return new ResponseEntity<>("Solar no puede ser vacio", headers, HttpStatus.BAD_REQUEST);
+                    }
+                    calleGeoCoder = calle != null ? calle + " " : "" + "manzana " + manzana + " solar " + solar;
+                    params.add("calle", calleGeoCoder);
+                    params.add("localidad", localidad);
+                    params.add("departamento", departamento);
+                    url = "https://direcciones.ide.uy/api/v0/geocode/BusquedaDireccion";
+                    builder = UriComponentsBuilder.fromHttpUrl(url)
+                            .queryParams(params);
+                    fullUrl = builder.toUriString();
+
+                    // Crear una entidad HttpEntity con los encabezados
+                    entity = new HttpEntity<>(headers);
+
+                    // Hacer la solicitud GET al servicio externo
+
+                    // Obtener la respuesta del servicio externo
+                    response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+                    input = "calleGeoCoder:" + calleGeoCoder + (!localidad.equals("") ? ";localidad:" + localidad : "");
+                    input = input + (!departamento.equals("") ? ";departamento:" + departamento : "");
+                    // Obtener la respuesta de ResponseEntity
+                    jsonString = response.getBody();
+                    // Crear un ObjectMapper de Jackson
+                    objectMapper = new ObjectMapper();
+                    // Analizar la cadena de texto JSON en una lista de objetos Java
+                    listaObjetos = objectMapper.readValue(jsonString, new TypeReference<List<Map<String, Object>>>() {
+                    });
+                    // Recorrer la lista de objetos
+                    for (Map<String, Object> objeto : listaObjetos) {
+                        // Acceder a los atributos de cada objeto
+                        String error = (String) objeto.get("error");
+                        Double lon = (Double) objeto.get("puntoX");
+                        Double lat = (Double) objeto.get("puntoY");
+                        if (error.isEmpty()) {
+                            repository.insertarCoordenadas(input, "IDE", lat, lon);
+                        }
+                    }
+                    return response;
+                }
+                case 4 -> {
+                    if (nombreInmueble == null) {
+                        return new ResponseEntity<>("nombreInmueble no puede ser vacio", headers,
+                                HttpStatus.BAD_REQUEST);
+                    }
+                    params.add("calle", nombreInmueble);
+                    params.add("departamento", departamento);
+                    url = "https://direcciones.ide.uy/api/v0/geocode/BusquedaDireccion";
+                    builder = UriComponentsBuilder.fromHttpUrl(url)
+                            .queryParams(params);
+                    fullUrl = builder.toUriString();
+
+                    // Crear una entidad HttpEntity con los encabezados
+                    entity = new HttpEntity<>(headers);
+                    // Obtener la respuesta del servicio externo
+                    response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+                    input = "nombreInmueble:" + nombreInmueble + (localidad != "" ? ";localidad:" + localidad : "");
+                    input = input + (departamento != "" ? ";departamento:" + departamento : "");
+                    // Obtener la respuesta de ResponseEntity
+                    jsonString = response.getBody();
+                    // Crear un ObjectMapper de Jackson
+                    objectMapper = new ObjectMapper();
+                    // Analizar la cadena de texto JSON en una lista de objetos Java
+                    listaObjetos = objectMapper.readValue(jsonString, new TypeReference<List<Map<String, Object>>>() {
+                    });
+                    // Recorrer la lista de objetos
+                    for (Map<String, Object> objeto : listaObjetos) {
+                        // Acceder a los atributos de cada objeto
+                        String error = (String) objeto.get("error");
+                        Double lon = (Double) objeto.get("puntoX");
+                        Double lat = (Double) objeto.get("puntoY");
+                        if (error.isEmpty()) {
+                            repository.insertarCoordenadas(input, "IDE", lat, lon);
+                        }
+                    }
+
+                    //NOMINATIM
+                    // Construir la URL con los parámetros
+                    url = "https://nominatim.openstreetmap.org/search";
+                    nombreInmueble = Utils.RemplazarTildesYEspacios(nombreInmueble);
+                    departamento = Utils.RemplazarTildesYEspacios(departamento);
+                    params.add("q", nombreInmueble + "+" + departamento);
+                    params.add("format", "json");
+                    builder = UriComponentsBuilder.fromHttpUrl(url)
+                            .queryParams(params);
+                    fullUrl = builder.toUriString();
+
+                    // Crear una entidad HttpEntity con los encabezados
+                    entity = new HttpEntity<>(headers);
+                    // Hacer la solicitud GET al servicio externo
+
+                    // Obtener la respuesta del servicio externo
+                    ResponseEntity<String> responseNominatim = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+
+                    input = "nombreInmueble:"+nombreInmueble;
+                    input = input + (departamento!="" ? ";departamento:"+departamento : "");
+                    // Obtener la respuesta de ResponseEntity
+                    String nominatimJsonString = responseNominatim.getBody();
+                    // Crear un ObjectMapper de Jackson
+                    objectMapper = new ObjectMapper();
+                    // Analizar la cadena de texto JSON en una lista de objetos Java
+                    listaObjetos = objectMapper.readValue(nominatimJsonString, new TypeReference<>() {
+                    });
+                    // Recorrer la lista de objetos
+                    for (Map<String, Object> objeto : listaObjetos) {
+                        // Acceder a los atributos de cada objeto
+                        Double lon = Double.parseDouble((String)objeto.get("lon"));
+                        Double lat = Double.parseDouble((String)objeto.get("lat"));
+                        repository.insertarCoordenadas(input, "NOMINATIN", lat, lon);
+                    }
+                    // RESPONSE FINAL
+                    // Convertir JSON1 a objeto Java
+                    ObjectMapper mapper = new ObjectMapper();
+                    Object[] array1 = mapper.readValue(jsonString, Object[].class);
+                    Object[] array2 = mapper.readValue(nominatimJsonString, Object[].class);
+                    Object[] concatenatedArray = new Object[array1.length + array2.length];
+                    System.arraycopy(array1, 0, concatenatedArray, 0, array1.length);
+                    System.arraycopy(array2, 0, concatenatedArray, array1.length, array2.length);
+                    String concatenatedJson = mapper.writeValueAsString(concatenatedArray);
+                    return new ResponseEntity<>(concatenatedJson, headers, HttpStatus.OK);
+                }
+                case 5 -> {
+                    if (numeroRuta == null) {
+                        return new ResponseEntity<String>("numeroRuta no puede ser vacio", headers,
+                                HttpStatus.BAD_REQUEST);
+                    }
+                    if (kilometro == null) {
+                        return new ResponseEntity<String>("kilometro no puede ser vacio", headers,
+                                HttpStatus.BAD_REQUEST);
+                    }
+                    params.add("km", kilometro.toString());
+                    params.add("ruta", numeroRuta.toString());
+
+                    // Construir la URL con los parámetros
+                    url = "https://direcciones.ide.uy/api/v1/geocode/rutakm";
+                    builder = UriComponentsBuilder.fromHttpUrl(url)
+                            .queryParams(params);
+                    fullUrl = builder.toUriString();
+
+                    // Crear una entidad HttpEntity con los encabezados
+                    entity = new HttpEntity<>(headers);
+
+                    // Obtener la respuesta del servicio externo
+                    response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+                    input = "numeroRuta:" + numeroRuta + ";kilometro:" + kilometro;
+                    // Obtener la respuesta de ResponseEntity
+                    jsonString = response.getBody();
+                    // Crear un ObjectMapper de Jackson
+                    objectMapper = new ObjectMapper();
+                    // Analizar la cadena de texto JSON en una lista de objetos Java
+                    listaObjetos = objectMapper.readValue(jsonString, new TypeReference<>() {
+                    });
+                    // Recorrer la lista de objetos
+                    for (Map<String, Object> objeto : listaObjetos) {
+                        // Acceder a los atributos de cada objeto
+                        Double lon = (Double) objeto.get("lon");
+                        Double lat = (Double) objeto.get("lat");
+                        repository.insertarCoordenadas(input, "IDE", lat, lon);
+                    }
+                    return response;
+                }
+                case 6 -> {
+                    // IDE
+                    if (calle == null) {
+                        return new ResponseEntity<>("Calle no puede ser vacio", headers, HttpStatus.BAD_REQUEST);
+                    }
+                    calleGeoCoder = calle + (numero != null ? " " + numero : "");
+                    // Construir la URL con los parámetros
+                    params.add("calle", calleGeoCoder);
+                    url = "https://direcciones.ide.uy/api/v0/geocode/BusquedaDireccion";
+                    builder = UriComponentsBuilder.fromHttpUrl(url)
+                            .queryParams(params);
+                    fullUrl = builder.toUriString();
+                    // Crear una entidad HttpEntity con los encabezados
+                    entity = new HttpEntity<>(headers);
+
+                    // Hacer la solicitud GET al servicio externo
+
+                    // Obtener la respuesta del servicio externo
+                    response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+                    input = "calleGeoCoder:" + calleGeoCoder;
+                    // Obtener la respuesta de ResponseEntity
+                    jsonString = response.getBody();
+                    // Crear un ObjectMapper de Jackson
+                    objectMapper = new ObjectMapper();
+                    // Analizar la cadena de texto JSON en una lista de objetos Java
+                    listaObjetos = objectMapper.readValue(jsonString, new TypeReference<>() {
+                    });
+                    // Recorrer la lista de objetos
+                    for (Map<String, Object> objeto : listaObjetos) {
+                        // Acceder a los atributos de cada objeto
+                        String error = (String) objeto.get("error");
+                        Double lon = (Double) objeto.get("puntoX");
+                        Double lat = (Double) objeto.get("puntoY");
+                        if (error.isEmpty()) {
+                            repository.insertarCoordenadas(input, "IDE", lat, lon);
+                        }
+                    }
+                    // NOMINATIM
+                    calle = Utils.RemplazarTildesYEspacios(calle);
+                    params.add("street", calle + "+" + numero);
+                    params.add("format", "json");
+                    url = "https://nominatim.openstreetmap.org/search";
+                    builder = UriComponentsBuilder.fromHttpUrl(url)
+                            .queryParams(params);
+                    fullUrl = builder.toUriString();
+
+                    // Crear una entidad HttpEntity con los encabezados
+                    entity = new HttpEntity<>(headers);
+                    // Hacer la solicitud GET al servicio externo
+
+                    // Obtener la respuesta del servicio externo
+                    response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+
+                    input = "calle:"+calle + ";numero:"+numero;
+                    // Obtener la respuesta de ResponseEntity
+                    String nominatimJsonString = response.getBody();
+                    // Crear un ObjectMapper de Jackson
+                    objectMapper = new ObjectMapper();
+                    // Analizar la cadena de texto JSON en una lista de objetos Java
+                    listaObjetos = objectMapper.readValue(nominatimJsonString, new TypeReference<>() {
+                    });
+                    // Recorrer la lista de objetos
+                    for (Map<String, Object> objeto : listaObjetos) {
+                        // Acceder a los atributos de cada objeto
+                        Double lon = Double.parseDouble((String)objeto.get("lon"));
+                        Double lat = Double.parseDouble((String)objeto.get("lat"));
+                        repository.insertarCoordenadas(input, "NOMINATIN", lat, lon);
+
+                    }
+                    // PHOTON
+                    MultiValueMap<String, String> paramsPhoton = new LinkedMultiValueMap<>();
+                    paramsPhoton.add("q", calle + "+" + numero);
+                    url = "https://photon.komoot.io/api/";
+                    builder = UriComponentsBuilder.fromHttpUrl(url)
+                            .queryParams(paramsPhoton);
+                    fullUrl = builder.toUriString();
+
+                    // Crear una entidad HttpEntity con los encabezados
+                    entity = new HttpEntity<>(headers);
+
+                    // Obtener la respuesta del servicio externo
+                    response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+
+                    input = "calle:" + calle + ";numero:" + numero;
+                    // Obtener la respuesta de ResponseEntity
+                    String photonJsonString = response.getBody();
+                    // Crear un ObjectMapper de Jackson
+                    objectMapper = new ObjectMapper();
+                    // Analizar la cadena de texto JSON en un objeto Java
+                    Map<String, Object> objeto = objectMapper.readValue(photonJsonString, new TypeReference<>() {
+                    });
+
+                    // Acceder a los valores del objeto
+                    listaObjetos = (List<Map<String, Object>>) objeto.get("features");
+                    Map<String, Object> primerObjeto = listaObjetos.get(0);
+                    Map<String, Object> geometry = (Map<String, Object>) primerObjeto.get("geometry");
+                    List<Double> coordenadas = (List<Double>) geometry.get("coordinates");
+                    Double latitud = coordenadas.get(1);
+                    Double longitud = coordenadas.get(0);
+                    repository.insertarCoordenadas(input, "PHOTON", latitud, longitud);
+                    // RESPONSE FINAL
+                    // Convertir JSON1 a objeto Java
+                    ObjectMapper mapper = new ObjectMapper();
+                    Object[] array1 = mapper.readValue(jsonString, Object[].class);
+                    Object[] array2 = mapper.readValue(nominatimJsonString, Object[].class);
+                    Object[] concatenatedArray = new Object[array1.length + array2.length];
+                    System.arraycopy(array1, 0, concatenatedArray, 0, array1.length);
+                    System.arraycopy(array2, 0, concatenatedArray, array1.length, array2.length);
+                    String concatenatedJson = mapper.writeValueAsString(concatenatedArray);
+                    return new ResponseEntity<>(concatenatedJson + photonJsonString, headers, HttpStatus.OK);
+
+                }
+                default -> {
+                    return new ResponseEntity<>("IDFORMACANONICA INVALIDO", headers, HttpStatus.BAD_REQUEST);
+                }
+            }
+        }
         if (idGeoCoder == 1) {
-            String url = "https://direcciones.ide.uy/api/v0/geocode/BusquedaDireccion";
-            String calleGeoCoder;
-            UriComponentsBuilder builder;
-            String fullUrl;
-            HttpEntity<String> entity;
-            ResponseEntity<String> response;
-
+            url = "https://direcciones.ide.uy/api/v0/geocode/BusquedaDireccion";
             switch (idFormaCanonica) {
                 case 1 -> {
                     if (calle == null) {
@@ -288,7 +663,6 @@ public class Service {
                     return response;
                 }
                 case 5 -> {
-                    System.out.println("Entro....");
                     if (numeroRuta == null) {
                         return new ResponseEntity<String>("numeroRuta no puede ser vacio", headers,
                                 HttpStatus.BAD_REQUEST);
@@ -337,6 +711,43 @@ public class Service {
                     }
                     return response;
                 }
+                case 6 -> {
+                    if (calle == null) {
+                        return new ResponseEntity<>("Calle no puede ser vacio", headers, HttpStatus.BAD_REQUEST);
+                    }
+                    calleGeoCoder = calle + (numero != null ? " " + numero : "");
+                    // Construir la URL con los parámetros
+                    params.add("calle", calleGeoCoder);
+                    builder = UriComponentsBuilder.fromHttpUrl(url)
+                            .queryParams(params);
+                    fullUrl = builder.toUriString();
+                    // Crear una entidad HttpEntity con los encabezados
+                    entity = new HttpEntity<>(headers);
+
+                    // Hacer la solicitud GET al servicio externo
+
+                    // Obtener la respuesta del servicio externo
+                    response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+                    input = "calleGeoCoder:" + calleGeoCoder;
+                    // Obtener la respuesta de ResponseEntity
+                    jsonString = response.getBody();
+                    // Crear un ObjectMapper de Jackson
+                    objectMapper = new ObjectMapper();
+                    // Analizar la cadena de texto JSON en una lista de objetos Java
+                    listaObjetos = objectMapper.readValue(jsonString, new TypeReference<>() {
+                    });
+                    // Recorrer la lista de objetos
+                    for (Map<String, Object> objeto : listaObjetos) {
+                        // Acceder a los atributos de cada objeto
+                        String error = (String) objeto.get("error");
+                        Double lon = (Double) objeto.get("puntoX");
+                        Double lat = (Double) objeto.get("puntoY");
+                        if (error.isEmpty()) {
+                            repository.insertarCoordenadas(input, "IDE", lat, lon);
+                        }
+                    }
+                    return response;
+                }
                 default -> {
                     return new ResponseEntity<>("IDFORMACANONICA INVALIDO", headers, HttpStatus.BAD_REQUEST);
                 }
@@ -344,11 +755,7 @@ public class Service {
         }
         if (idGeoCoder == 2) {
 
-            String url = "https://nominatim.openstreetmap.org/search";
-            UriComponentsBuilder builder;
-            String fullUrl;
-            HttpEntity<String> entity;
-            ResponseEntity<String> response;
+            url = "https://nominatim.openstreetmap.org/search";
             switch (idFormaCanonica) {
                 case 6 -> {
                     // Construir la URL con los parámetros
@@ -448,11 +855,7 @@ public class Service {
         }
         if (idGeoCoder == 3) {
             {
-                String url = "https://photon.komoot.io/api/";
-                UriComponentsBuilder builder;
-                String fullUrl;
-                HttpEntity<String> entity;
-                ResponseEntity<String> response;
+                url = "https://photon.komoot.io/api/";
                 if (idFormaCanonica == 6) {// Construir la URL con los parámetros
                     calle = Utils.RemplazarTildesYEspacios(calle);
                     params.add("q", calle + "+" + numero);
