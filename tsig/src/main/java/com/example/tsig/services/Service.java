@@ -1,5 +1,6 @@
 package com.example.tsig.services;
 
+import com.example.tsig.cache.TsigCache;
 import com.example.tsig.repositories.Repository;
 import com.example.tsig.utils.Utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -16,6 +17,7 @@ import org.springframework.web.util.UriBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +26,9 @@ public class Service {
 
     @Autowired
     Repository repository;
+
+    @Autowired
+    TsigCache tsigCache;
 
     public Map<Integer, String> formasCanonicas() {
         return repository.obtenerFormasCanonicas();
@@ -84,6 +89,18 @@ public class Service {
                     input = input + (departamento != "" ? ";departamento:" + departamento : "");
                     // Obtener la respuesta de ResponseEntity
                     jsonString = response.getBody();
+
+					//Preparo datos para guardar en cache
+					Map<String, String> datos = new HashMap<>();
+					datos.put("id_geocoder", "1");
+					datos.put("id_canonic_form", "1");
+					datos.put("calle", calle);
+					datos.put("numero", numero);
+					datos.put("localidad", localidad);
+					datos.put("departamento", departamento);
+					datos.put("response", jsonString);
+					tsigCache.insertarEnCahe(datos);
+
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
                     // Analizar la cadena de texto JSON en una lista de objetos Java
@@ -129,6 +146,18 @@ public class Service {
                     input = input + (departamento != "" ? ";departamento:" + departamento : "");
                     // Obtener la respuesta de ResponseEntity
                     jsonString = response.getBody();
+
+                    Map<String, String> datos = new HashMap<>();
+                    datos.put("id_geocoder", "1");
+					datos.put("id_canonic_form", "2");
+					datos.put("calle", calle);
+					datos.put("numero", numero);
+					datos.put("calle2", calle2);
+					datos.put("localidad", localidad);
+					datos.put("departamento", departamento);
+					datos.put("response", jsonString);
+					tsigCache.insertarEnCahe(datos);
+
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
                     // Analizar la cadena de texto JSON en una lista de objetos Java
@@ -182,6 +211,17 @@ public class Service {
                     input = input + (departamento != "" ? ";departamento:" + departamento : "");
                     // Obtener la respuesta de ResponseEntity
                     jsonString = response.getBody();
+
+                    Map<String, String> datos = new HashMap<>();
+                    datos.put("id_geocoder", "1");
+					datos.put("id_canonic_form", "3");
+					datos.put("manzana", manzana);
+					datos.put("solar", solar);
+					datos.put("localidad", localidad);
+					datos.put("departamento", departamento);
+					datos.put("response", jsonString);
+                    tsigCache.insertarEnCahe(datos);
+
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
                     // Analizar la cadena de texto JSON en una lista de objetos Java
@@ -220,6 +260,16 @@ public class Service {
                     input = input + (departamento != "" ? ";departamento:" + departamento : "");
                     // Obtener la respuesta de ResponseEntity
                     jsonString = response.getBody();
+
+                    Map<String, String> datos = new HashMap<>();
+                    datos.put("id_geocoder", "1");
+					datos.put("id_canonic_form", "4");
+					datos.put("nombre_inmueble", nombreInmueble);
+					datos.put("localidad", localidad);
+					datos.put("departamento", departamento);
+					datos.put("response", jsonString);
+                    tsigCache.insertarEnCahe(datos);
+
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
                     // Analizar la cadena de texto JSON en una lista de objetos Java
@@ -264,6 +314,15 @@ public class Service {
                     input = "numeroRuta:" + numeroRuta.toString() + ";kilometro:" + kilometro;
                     // Obtener la respuesta de ResponseEntity
                     jsonString = response.getBody();
+
+                    Map<String, String> datos = new HashMap<>();
+					datos.put("id_geocoder", "1");
+					datos.put("id_canonic_form", "5");
+					datos.put("numeroruta", numeroRuta.toString());
+					datos.put("kilometro", kilometro.toString());
+                    tsigCache.insertarEnCahe(datos);
+
+
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
                     // Analizar la cadena de texto JSON en una lista de objetos Java
@@ -311,6 +370,15 @@ public class Service {
                     input = "calle:"+calle + ";numero:"+numero;
                     // Obtener la respuesta de ResponseEntity
                     jsonString = response.getBody();
+
+                    Map<String, String> datos = new HashMap<>();
+                    datos.put("id_geocoder", "2");
+					datos.put("id_canonic_form", "6");
+					datos.put("calle", calle);
+					datos.put("numero", numero);
+					datos.put("response", jsonString);
+                    tsigCache.insertarEnCahe(datos);
+
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
                     // Analizar la cadena de texto JSON en una lista de objetos Java
@@ -347,6 +415,16 @@ public class Service {
                     input = input + (departamento!="" ? ";departamento:"+departamento : "");
                     // Obtener la respuesta de ResponseEntity
                     jsonString = response.getBody();
+
+                    Map<String, String> datos = new HashMap<>();
+                    datos.put("id_geocoder", "2");
+					datos.put("id_canonic_form", "4");
+					datos.put("nombre_inmueble", nombreInmueble);
+					datos.put("localidad", localidad);
+					datos.put("departamento", departamento);
+					datos.put("response", jsonString);
+                    tsigCache.insertarEnCahe(datos);
+
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
                     // Analizar la cadena de texto JSON en una lista de objetos Java
@@ -393,6 +471,15 @@ public class Service {
                     input = "calle:" + calle + ";numero:" + numero;
                     // Obtener la respuesta de ResponseEntity
                     jsonString = response.getBody();
+
+                    Map<String, String> datos = new HashMap<>();
+                    datos.put("id_geocoder", "3");
+                    datos.put("id_canonic_form", "6");
+                    datos.put("calle", calle);
+                    datos.put("numero", numero);
+                    datos.put("response", jsonString);
+                    tsigCache.insertarEnCahe(datos);
+
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
                     // Analizar la cadena de texto JSON en un objeto Java

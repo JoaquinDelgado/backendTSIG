@@ -14,7 +14,26 @@ Pasos para poder establecer conexion con base de datos
       geocoder character varying,
       latitud double precision,
       longitud double precision
-      )
+      );
+      
+      CREATE TABLE IF NOT EXISTS public.cache_busqueda
+      (
+	id SERIAL PRIMARY KEY,
+	id_geocoder integer,
+	id_canonic_form integer,
+	calle character varying COLLATE pg_catalog."default",
+	numero character varying COLLATE pg_catalog."default",
+	localidad character varying COLLATE pg_catalog."default",
+	departamento character varying COLLATE pg_catalog."default",
+	calle2 character varying COLLATE pg_catalog."default",
+	manzana character varying COLLATE pg_catalog."default",
+	solar character varying COLLATE pg_catalog."default",
+	nombre_inmueble character varying COLLATE pg_catalog."default",
+	numeroRuta character varying COLLATE pg_catalog."default",
+	kilometro character varying COLLATE pg_catalog."default",
+	response character varying COLLATE pg_catalog."default",
+	fecha_creado timestamp
+	);
 
 
 3) En el application.properties deben colocar lo siguiente:
