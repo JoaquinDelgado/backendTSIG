@@ -40,13 +40,13 @@ public class Service {
     }
 
     public ResponseEntity<?> busquedaDireccionEstructurada(Integer idGeoCoder,
-                                                Integer idFormaCanonica,
-                                                String calle, String numero,
-                                                String localidad,
-                                                String departamento,
-                                                String calle2, String manzana,
-                                                String solar, String nombreInmueble,
-                                                Integer numeroRuta, Double kilometro) throws JsonProcessingException {
+            Integer idFormaCanonica,
+            String calle, String numero,
+            String localidad,
+            String departamento,
+            String calle2, String manzana,
+            String solar, String nombreInmueble,
+            Integer numeroRuta, Double kilometro) throws JsonProcessingException {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -54,6 +54,8 @@ public class Service {
         // Construir los parámetros
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         String jsonString;
+        String nominatimJsonString = "";
+        String photonJsonString = "";
         String input;
         List<Map<String, Object>> listaObjetos;
         ObjectMapper objectMapper;
@@ -74,6 +76,25 @@ public class Service {
                     params.add("calle", calleGeoCoder);
                     params.add("localidad", localidad);
                     params.add("departamento", departamento);
+
+                    // Datos para buscar en cache
+                    Map<String, String> datos = new HashMap<>();
+                    datos.put("id_geocoder", "1");
+                    datos.put("id_canonic_form", "1");
+                    datos.put("calle", calle);
+                    datos.put("numero", numero);
+                    datos.put("localidad", localidad);
+                    datos.put("departamento", departamento);
+
+                    // Busco en cache
+                    String cache = tsigCache.obtenerDeCache(datos);
+                    if (cache != null) {
+                        System.out.println("Cache Si");
+                        return new ResponseEntity<>(cache, headers, HttpStatus.OK);
+                    } else {
+                        System.out.println("Cache No");
+                    }
+
                     url = "https://direcciones.ide.uy/api/v0/geocode/BusquedaDireccion";
                     builder = UriComponentsBuilder.fromHttpUrl(url)
                             .queryParams(params);
@@ -81,10 +102,16 @@ public class Service {
 
                     entity = new HttpEntity<>(headers);
                     response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
-                    input = "calleGeoCoder:" + calleGeoCoder + (!Objects.equals(localidad, "") ? ";localidad:" + localidad : "");
+                    input = "calleGeoCoder:" + calleGeoCoder
+                            + (!Objects.equals(localidad, "") ? ";localidad:" + localidad : "");
                     input = input + (!Objects.equals(departamento, "") ? ";departamento:" + departamento : "");
                     // Obtener la respuesta de ResponseEntity
                     jsonString = response.getBody();
+
+                    // Agrego response para guardar en cache
+                    datos.put("response", jsonString);
+                    tsigCache.insertarEnCache(datos);
+
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
                     // Analizar la cadena de texto JSON en una lista de objetos Java
@@ -114,6 +141,26 @@ public class Service {
                     params.add("calle", calleGeoCoder);
                     params.add("localidad", localidad);
                     params.add("departamento", departamento);
+
+                    // Datos para buscar en cache
+                    Map<String, String> datos = new HashMap<>();
+                    datos.put("id_geocoder", "1");
+                    datos.put("id_canonic_form", "2");
+                    datos.put("calle", calle);
+                    datos.put("numero", numero);
+                    datos.put("calle2", calle2);
+                    datos.put("localidad", localidad);
+                    datos.put("departamento", departamento);
+
+                    // Busco en cache
+                    String cache = tsigCache.obtenerDeCache(datos);
+                    if (cache != null) {
+                        System.out.println("Cache Si");
+                        return new ResponseEntity<>(cache, headers, HttpStatus.OK);
+                    } else {
+                        System.out.println("Cache No");
+                    }
+
                     url = "https://direcciones.ide.uy/api/v0/geocode/BusquedaDireccion";
                     builder = UriComponentsBuilder.fromHttpUrl(url)
                             .queryParams(params);
@@ -126,10 +173,16 @@ public class Service {
 
                     // Obtener la respuesta del servicio externo
                     response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
-                    input = "calleGeoCoder:" + calleGeoCoder + (!Objects.equals(localidad, "") ? ";localidad:" + localidad : "");
+                    input = "calleGeoCoder:" + calleGeoCoder
+                            + (!Objects.equals(localidad, "") ? ";localidad:" + localidad : "");
                     input = input + (!Objects.equals(departamento, "") ? ";departamento:" + departamento : "");
                     // Obtener la respuesta de ResponseEntity
                     jsonString = response.getBody();
+
+                    // Agrego response para guardar en cache
+                    datos.put("response", jsonString);
+                    tsigCache.insertarEnCache(datos);
+
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
                     // Analizar la cadena de texto JSON en una lista de objetos Java
@@ -167,6 +220,25 @@ public class Service {
                     params.add("calle", calleGeoCoder);
                     params.add("localidad", localidad);
                     params.add("departamento", departamento);
+
+                    // Datos para buscar en cache
+                    Map<String, String> datos = new HashMap<>();
+                    datos.put("id_geocoder", "1");
+                    datos.put("id_canonic_form", "3");
+                    datos.put("manzana", manzana);
+                    datos.put("solar", solar);
+                    datos.put("localidad", localidad);
+                    datos.put("departamento", departamento);
+
+                    // Busco en cache
+                    String cache = tsigCache.obtenerDeCache(datos);
+                    if (cache != null) {
+                        System.out.println("Cache Si");
+                        return new ResponseEntity<>(cache, headers, HttpStatus.OK);
+                    } else {
+                        System.out.println("Cache No");
+                    }
+
                     url = "https://direcciones.ide.uy/api/v0/geocode/BusquedaDireccion";
                     builder = UriComponentsBuilder.fromHttpUrl(url)
                             .queryParams(params);
@@ -183,6 +255,11 @@ public class Service {
                     input = input + (!departamento.equals("") ? ";departamento:" + departamento : "");
                     // Obtener la respuesta de ResponseEntity
                     jsonString = response.getBody();
+
+                    // Agrego response para guardar en cache
+                    datos.put("response", jsonString);
+                    tsigCache.insertarEnCache(datos);
+
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
                     // Analizar la cadena de texto JSON en una lista de objetos Java
@@ -207,69 +284,118 @@ public class Service {
                     }
                     params.add("calle", nombreInmueble);
                     params.add("departamento", departamento);
-                    url = "https://direcciones.ide.uy/api/v0/geocode/BusquedaDireccion";
-                    builder = UriComponentsBuilder.fromHttpUrl(url)
-                            .queryParams(params);
-                    fullUrl = builder.toUriString();
 
-                    // Crear una entidad HttpEntity con los encabezados
-                    entity = new HttpEntity<>(headers);
-                    // Obtener la respuesta del servicio externo
-                    response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
-                    input = "nombreInmueble:" + nombreInmueble + (localidad != "" ? ";localidad:" + localidad : "");
-                    input = input + (departamento != "" ? ";departamento:" + departamento : "");
-                    // Obtener la respuesta de ResponseEntity
-                    jsonString = response.getBody();
-                    // Crear un ObjectMapper de Jackson
-                    objectMapper = new ObjectMapper();
-                    // Analizar la cadena de texto JSON en una lista de objetos Java
-                    listaObjetos = objectMapper.readValue(jsonString, new TypeReference<List<Map<String, Object>>>() {
-                    });
-                    // Recorrer la lista de objetos
-                    for (Map<String, Object> objeto : listaObjetos) {
-                        // Acceder a los atributos de cada objeto
-                        String error = (String) objeto.get("error");
-                        Double lon = (Double) objeto.get("puntoX");
-                        Double lat = (Double) objeto.get("puntoY");
-                        if (error.isEmpty()) {
-                            repository.insertarCoordenadas(input, "IDE", lat, lon);
+                    // Datos para buscar en cache
+                    Map<String, String> datos = new HashMap<>();
+                    datos.put("id_geocoder", "1");
+                    datos.put("id_canonic_form", "4");
+                    datos.put("nombre_inmueble", nombreInmueble);
+                    datos.put("localidad", localidad);
+                    datos.put("departamento", departamento);
+
+                    // Busco en cache
+                    String cache = tsigCache.obtenerDeCache(datos);
+                    if (cache != null) {
+                        System.out.println("Cache Si");
+                        jsonString = cache;
+                    } else {
+                        System.out.println("Cache No");
+                        url = "https://direcciones.ide.uy/api/v0/geocode/BusquedaDireccion";
+                        builder = UriComponentsBuilder.fromHttpUrl(url)
+                                .queryParams(params);
+                        fullUrl = builder.toUriString();
+
+                        // Crear una entidad HttpEntity con los encabezados
+                        entity = new HttpEntity<>(headers);
+                        // Obtener la respuesta del servicio externo
+                        response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+                        input = "nombreInmueble:" + nombreInmueble + (localidad != "" ? ";localidad:" + localidad : "");
+                        input = input + (departamento != "" ? ";departamento:" + departamento : "");
+                        // Obtener la respuesta de ResponseEntity
+                        jsonString = response.getBody();
+
+                        // Agrego response para guardar en cache
+                        datos.put("response", jsonString);
+                        tsigCache.insertarEnCache(datos);
+
+                        // Crear un ObjectMapper de Jackson
+                        objectMapper = new ObjectMapper();
+                        // Analizar la cadena de texto JSON en una lista de objetos Java
+                        listaObjetos = objectMapper.readValue(jsonString,
+                                new TypeReference<List<Map<String, Object>>>() {
+                                });
+                        // Recorrer la lista de objetos
+                        for (Map<String, Object> objeto : listaObjetos) {
+                            // Acceder a los atributos de cada objeto
+                            String error = (String) objeto.get("error");
+                            Double lon = (Double) objeto.get("puntoX");
+                            Double lat = (Double) objeto.get("puntoY");
+                            if (error.isEmpty()) {
+                                repository.insertarCoordenadas(input, "IDE", lat, lon);
+                            }
                         }
+
                     }
 
-                    //NOMINATIM
+                    // NOMINATIM
                     // Construir la URL con los parámetros
                     url = "https://nominatim.openstreetmap.org/search";
                     nombreInmueble = Utils.RemplazarTildesYEspacios(nombreInmueble);
                     departamento = Utils.RemplazarTildesYEspacios(departamento);
                     params.add("q", nombreInmueble + "+" + departamento);
                     params.add("format", "json");
-                    builder = UriComponentsBuilder.fromHttpUrl(url)
-                            .queryParams(params);
-                    fullUrl = builder.toUriString();
 
-                    // Crear una entidad HttpEntity con los encabezados
-                    entity = new HttpEntity<>(headers);
-                    // Hacer la solicitud GET al servicio externo
+                    datos = new HashMap<>();
+                    datos.put("id_geocoder", "2");
+                    datos.put("id_canonic_form", "4");
+                    datos.put("nombre_inmueble", nombreInmueble);
+                    datos.put("localidad", localidad);
+                    datos.put("departamento", departamento);
 
-                    // Obtener la respuesta del servicio externo
-                    ResponseEntity<String> responseNominatim = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+                    // Busco en cache
+                    cache = tsigCache.obtenerDeCache(datos);
+                    if (cache != null) {
+                        System.out.println("Cache Si");
+                        nominatimJsonString = cache;
+                    } else {
+                        System.out.println("Cache No");
+                        builder = UriComponentsBuilder.fromHttpUrl(url)
+                                .queryParams(params);
+                        fullUrl = builder.toUriString();
 
-                    input = "nombreInmueble:"+nombreInmueble;
-                    input = input + (departamento!="" ? ";departamento:"+departamento : "");
-                    // Obtener la respuesta de ResponseEntity
-                    String nominatimJsonString = responseNominatim.getBody();
-                    // Crear un ObjectMapper de Jackson
-                    objectMapper = new ObjectMapper();
-                    // Analizar la cadena de texto JSON en una lista de objetos Java
-                    listaObjetos = objectMapper.readValue(nominatimJsonString, new TypeReference<>() {
-                    });
-                    // Recorrer la lista de objetos
-                    for (Map<String, Object> objeto : listaObjetos) {
-                        // Acceder a los atributos de cada objeto
-                        Double lon = Double.parseDouble((String)objeto.get("lon"));
-                        Double lat = Double.parseDouble((String)objeto.get("lat"));
-                        repository.insertarCoordenadas(input, "NOMINATIN", lat, lon);
+                        // Crear una entidad HttpEntity con los encabezados
+                        entity = new HttpEntity<>(headers);
+                        // Hacer la solicitud GET al servicio externo
+
+                        // Obtener la respuesta del servicio externo
+                        ResponseEntity<String> responseNominatim = restTemplate.exchange(fullUrl, HttpMethod.GET,
+                                entity,
+                                String.class);
+
+                        input = "nombreInmueble:" + nombreInmueble;
+                        input = input + (departamento != "" ? ";departamento:" + departamento : "");
+                        // Obtener la respuesta de ResponseEntity
+                        nominatimJsonString = responseNominatim.getBody();
+
+                        // Agrego response para guardar en cache
+                        datos.put("response", nominatimJsonString);
+                        tsigCache.insertarEnCache(datos);
+
+                        // Crear un ObjectMapper de Jackson
+                        objectMapper = new ObjectMapper();
+                        // Analizar la cadena de texto JSON en una lista de objetos Java
+                        listaObjetos = objectMapper.readValue(nominatimJsonString, new TypeReference<>() {
+                        });
+                        // Recorrer la lista de objetos
+                        for (Map<String, Object> objeto : listaObjetos) {
+                            // Acceder a los atributos de cada objeto
+                            Double lon = Double.parseDouble((String) objeto.get("lon"));
+                            Double lat = Double.parseDouble((String) objeto.get("lat"));
+                            repository.insertarCoordenadas(input, "NOMINATIN", lat, lon);
+                        }
+
                     }
+
                     // RESPONSE FINAL
                     // Convertir JSON1 a objeto Java
                     ObjectMapper mapper = new ObjectMapper();
@@ -293,6 +419,22 @@ public class Service {
                     params.add("km", kilometro.toString());
                     params.add("ruta", numeroRuta.toString());
 
+                    // Datos para buscar en cache
+                    Map<String, String> datos = new HashMap<>();
+                    datos.put("id_geocoder", "1");
+                    datos.put("id_canonic_form", "5");
+                    datos.put("numeroruta", numeroRuta.toString());
+                    datos.put("kilometro", kilometro.toString());
+
+                    // Busco en cache
+                    String cache = tsigCache.obtenerDeCache(datos);
+                    if (cache != null) {
+                        System.out.println("Cache Si");
+                        return new ResponseEntity<>(cache, headers, HttpStatus.OK);
+                    } else {
+                        System.out.println("Cache No");
+                    }
+
                     // Construir la URL con los parámetros
                     url = "https://direcciones.ide.uy/api/v1/geocode/rutakm";
                     builder = UriComponentsBuilder.fromHttpUrl(url)
@@ -307,6 +449,11 @@ public class Service {
                     input = "numeroRuta:" + numeroRuta + ";kilometro:" + kilometro;
                     // Obtener la respuesta de ResponseEntity
                     jsonString = response.getBody();
+
+                    // Agrego response para guardar en cache
+                    datos.put("response", jsonString);
+                    tsigCache.insertarEnCache(datos);
+
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
                     // Analizar la cadena de texto JSON en una lista de objetos Java
@@ -329,98 +476,167 @@ public class Service {
                     calleGeoCoder = calle + (numero != null ? " " + numero : "");
                     // Construir la URL con los parámetros
                     params.add("calle", calleGeoCoder);
-                    url = "https://direcciones.ide.uy/api/v0/geocode/BusquedaDireccion";
-                    builder = UriComponentsBuilder.fromHttpUrl(url)
-                            .queryParams(params);
-                    fullUrl = builder.toUriString();
-                    // Crear una entidad HttpEntity con los encabezados
-                    entity = new HttpEntity<>(headers);
 
-                    // Hacer la solicitud GET al servicio externo
+                    // Datos para buscar en cache
+                    Map<String, String> datos = new HashMap<>();
+                    datos.put("id_geocoder", "1");
+                    datos.put("id_canonic_form", "6");
+                    datos.put("calle", calle);
+                    datos.put("numero", numero);
 
-                    // Obtener la respuesta del servicio externo
-                    response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
-                    input = "calleGeoCoder:" + calleGeoCoder;
-                    // Obtener la respuesta de ResponseEntity
-                    jsonString = response.getBody();
-                    // Crear un ObjectMapper de Jackson
-                    objectMapper = new ObjectMapper();
-                    // Analizar la cadena de texto JSON en una lista de objetos Java
-                    listaObjetos = objectMapper.readValue(jsonString, new TypeReference<>() {
-                    });
-                    // Recorrer la lista de objetos
-                    for (Map<String, Object> objeto : listaObjetos) {
-                        // Acceder a los atributos de cada objeto
-                        String error = (String) objeto.get("error");
-                        Double lon = (Double) objeto.get("puntoX");
-                        Double lat = (Double) objeto.get("puntoY");
-                        if (error.isEmpty()) {
-                            repository.insertarCoordenadas(input, "IDE", lat, lon);
+                    // Busco en cache
+                    String cache = tsigCache.obtenerDeCache(datos);
+                    if (cache != null) {
+                        System.out.println("Cache Si");
+                        jsonString = cache;
+                    } else {
+                        System.out.println("Cache No");
+                        url = "https://direcciones.ide.uy/api/v0/geocode/BusquedaDireccion";
+                        builder = UriComponentsBuilder.fromHttpUrl(url)
+                                .queryParams(params);
+                        fullUrl = builder.toUriString();
+                        // Crear una entidad HttpEntity con los encabezados
+                        entity = new HttpEntity<>(headers);
+
+                        // Hacer la solicitud GET al servicio externo
+
+                        // Obtener la respuesta del servicio externo
+                        response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+                        input = "calleGeoCoder:" + calleGeoCoder;
+                        // Obtener la respuesta de ResponseEntity
+                        jsonString = response.getBody();
+
+                        // Datos para guardar en cache
+                        datos.put("response", jsonString);
+                        tsigCache.insertarEnCache(datos);
+
+                        // Crear un ObjectMapper de Jackson
+                        objectMapper = new ObjectMapper();
+                        // Analizar la cadena de texto JSON en una lista de objetos Java
+                        listaObjetos = objectMapper.readValue(jsonString, new TypeReference<>() {
+                        });
+                        // Recorrer la lista de objetos
+                        for (Map<String, Object> objeto : listaObjetos) {
+                            // Acceder a los atributos de cada objeto
+                            String error = (String) objeto.get("error");
+                            Double lon = (Double) objeto.get("puntoX");
+                            Double lat = (Double) objeto.get("puntoY");
+                            if (error.isEmpty()) {
+                                repository.insertarCoordenadas(input, "IDE", lat, lon);
+                            }
                         }
+
                     }
+
                     // NOMINATIM
                     calle = Utils.RemplazarTildesYEspacios(calle);
                     params.add("street", calle + "+" + numero);
                     params.add("format", "json");
                     url = "https://nominatim.openstreetmap.org/search";
-                    builder = UriComponentsBuilder.fromHttpUrl(url)
-                            .queryParams(params);
-                    fullUrl = builder.toUriString();
 
-                    // Crear una entidad HttpEntity con los encabezados
-                    entity = new HttpEntity<>(headers);
-                    // Hacer la solicitud GET al servicio externo
+                    // Datos para buscar en cache
+                    datos = new HashMap<>();
+                    datos.put("id_geocoder", "2");
+                    datos.put("id_canonic_form", "6");
+                    datos.put("calle", calle);
+                    datos.put("numero", numero);
 
-                    // Obtener la respuesta del servicio externo
-                    response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+                    // Busco en cache
+                    cache = tsigCache.obtenerDeCache(datos);
+                    if (cache != null) {
+                        System.out.println("Cache Si");
+                        nominatimJsonString  = cache;
+                    } else {
+                        System.out.println("Cache No");
+                        builder = UriComponentsBuilder.fromHttpUrl(url)
+                                .queryParams(params);
+                        fullUrl = builder.toUriString();
 
-                    input = "calle:"+calle + ";numero:"+numero;
-                    // Obtener la respuesta de ResponseEntity
-                    String nominatimJsonString = response.getBody();
-                    // Crear un ObjectMapper de Jackson
-                    objectMapper = new ObjectMapper();
-                    // Analizar la cadena de texto JSON en una lista de objetos Java
-                    listaObjetos = objectMapper.readValue(nominatimJsonString, new TypeReference<>() {
-                    });
-                    // Recorrer la lista de objetos
-                    for (Map<String, Object> objeto : listaObjetos) {
-                        // Acceder a los atributos de cada objeto
-                        Double lon = Double.parseDouble((String)objeto.get("lon"));
-                        Double lat = Double.parseDouble((String)objeto.get("lat"));
-                        repository.insertarCoordenadas(input, "NOMINATIN", lat, lon);
+                        // Crear una entidad HttpEntity con los encabezados
+                        entity = new HttpEntity<>(headers);
+                        // Hacer la solicitud GET al servicio externo
+
+                        // Obtener la respuesta del servicio externo
+                        response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+
+                        input = "calle:" + calle + ";numero:" + numero;
+                        // Obtener la respuesta de ResponseEntity
+                        nominatimJsonString = response.getBody();
+
+                        // Datos para guardar en cache
+                        datos.put("response", nominatimJsonString);
+                        tsigCache.insertarEnCache(datos);
+
+                        // Crear un ObjectMapper de Jackson
+                        objectMapper = new ObjectMapper();
+                        // Analizar la cadena de texto JSON en una lista de objetos Java
+                        listaObjetos = objectMapper.readValue(nominatimJsonString, new TypeReference<>() {
+                        });
+                        // Recorrer la lista de objetos
+                        for (Map<String, Object> objeto : listaObjetos) {
+                            // Acceder a los atributos de cada objeto
+                            Double lon = Double.parseDouble((String) objeto.get("lon"));
+                            Double lat = Double.parseDouble((String) objeto.get("lat"));
+                            repository.insertarCoordenadas(input, "NOMINATIN", lat, lon);
+
+                        }
 
                     }
+
                     // PHOTON
                     MultiValueMap<String, String> paramsPhoton = new LinkedMultiValueMap<>();
                     paramsPhoton.add("q", calle + "+" + numero);
-                    url = "https://photon.komoot.io/api/";
-                    builder = UriComponentsBuilder.fromHttpUrl(url)
-                            .queryParams(paramsPhoton);
-                    fullUrl = builder.toUriString();
 
-                    // Crear una entidad HttpEntity con los encabezados
-                    entity = new HttpEntity<>(headers);
+                    // Datos para buscar en cache
+                    datos = new HashMap<>();
+                    datos.put("id_geocoder", "3");
+                    datos.put("id_canonic_form", "6");
+                    datos.put("calle", calle);
+                    datos.put("numero", numero);
 
-                    // Obtener la respuesta del servicio externo
-                    response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+                    // Busco en cache
+                    cache = tsigCache.obtenerDeCache(datos);
+                    if (cache != null) {
+                        System.out.println("Cache Si");
+                        photonJsonString = cache;
+                    } else {
+                        System.out.println("Cache No");
+                        url = "https://photon.komoot.io/api/";
+                        builder = UriComponentsBuilder.fromHttpUrl(url)
+                                .queryParams(paramsPhoton);
+                        fullUrl = builder.toUriString();
 
-                    input = "calle:" + calle + ";numero:" + numero;
-                    // Obtener la respuesta de ResponseEntity
-                    String photonJsonString = response.getBody();
-                    // Crear un ObjectMapper de Jackson
-                    objectMapper = new ObjectMapper();
-                    // Analizar la cadena de texto JSON en un objeto Java
-                    Map<String, Object> objeto = objectMapper.readValue(photonJsonString, new TypeReference<>() {
-                    });
+                        // Crear una entidad HttpEntity con los encabezados
+                        entity = new HttpEntity<>(headers);
 
-                    // Acceder a los valores del objeto
-                    listaObjetos = (List<Map<String, Object>>) objeto.get("features");
-                    Map<String, Object> primerObjeto = listaObjetos.get(0);
-                    Map<String, Object> geometry = (Map<String, Object>) primerObjeto.get("geometry");
-                    List<Double> coordenadas = (List<Double>) geometry.get("coordinates");
-                    Double latitud = coordenadas.get(1);
-                    Double longitud = coordenadas.get(0);
-                    repository.insertarCoordenadas(input, "PHOTON", latitud, longitud);
+                        // Obtener la respuesta del servicio externo
+                        response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+
+                        input = "calle:" + calle + ";numero:" + numero;
+                        // Obtener la respuesta de ResponseEntity
+                        photonJsonString = response.getBody();
+
+                        // Datos para guardar en cache
+                        datos.put("response", photonJsonString);
+                        tsigCache.insertarEnCache(datos);
+
+                        // Crear un ObjectMapper de Jackson
+                        objectMapper = new ObjectMapper();
+                        // Analizar la cadena de texto JSON en un objeto Java
+                        Map<String, Object> objeto = objectMapper.readValue(photonJsonString, new TypeReference<>() {
+                        });
+
+                        // Acceder a los valores del objeto
+                        listaObjetos = (List<Map<String, Object>>) objeto.get("features");
+                        Map<String, Object> primerObjeto = listaObjetos.get(0);
+                        Map<String, Object> geometry = (Map<String, Object>) primerObjeto.get("geometry");
+                        List<Double> coordenadas = (List<Double>) geometry.get("coordinates");
+                        Double latitud = coordenadas.get(1);
+                        Double longitud = coordenadas.get(0);
+                        repository.insertarCoordenadas(input, "PHOTON", latitud, longitud);
+
+                    }
+
                     // RESPONSE FINAL
                     // Convertir JSON1 a objeto Java
                     ObjectMapper mapper = new ObjectMapper();
@@ -450,6 +666,25 @@ public class Service {
                     params.add("calle", calleGeoCoder);
                     params.add("localidad", localidad);
                     params.add("departamento", departamento);
+
+                    // Datos para buscar en cache
+                    Map<String, String> datos = new HashMap<>();
+                    datos.put("id_geocoder", "1");
+                    datos.put("id_canonic_form", "1");
+                    datos.put("calle", calle);
+                    datos.put("numero", numero);
+                    datos.put("localidad", localidad);
+                    datos.put("departamento", departamento);
+
+                    // Busco en cache
+                    String cache = tsigCache.obtenerDeCache(datos);
+                    if (cache != null) {
+                        System.out.println("Cache Si");
+                        return new ResponseEntity<>(cache, headers, HttpStatus.OK);
+                    } else {
+                        System.out.println("Cache No");
+                    }
+
                     builder = UriComponentsBuilder.fromHttpUrl(url)
                             .queryParams(params);
                     fullUrl = builder.toUriString();
@@ -465,16 +700,9 @@ public class Service {
                     // Obtener la respuesta de ResponseEntity
                     jsonString = response.getBody();
 
-					//Preparo datos para guardar en cache
-					Map<String, String> datos = new HashMap<>();
-					datos.put("id_geocoder", "1");
-					datos.put("id_canonic_form", "1");
-					datos.put("calle", calle);
-					datos.put("numero", numero);
-					datos.put("localidad", localidad);
-					datos.put("departamento", departamento);
-					datos.put("response", jsonString);
-					tsigCache.insertarEnCache(datos);
+                    // Agrego response para guardar en cache
+                    datos.put("response", jsonString);
+                    tsigCache.insertarEnCache(datos);
 
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
@@ -505,6 +733,26 @@ public class Service {
                     params.add("calle", calleGeoCoder);
                     params.add("localidad", localidad);
                     params.add("departamento", departamento);
+
+                    // Datos para buscar en cache
+                    Map<String, String> datos = new HashMap<>();
+                    datos.put("id_geocoder", "1");
+                    datos.put("id_canonic_form", "2");
+                    datos.put("calle", calle);
+                    datos.put("numero", numero);
+                    datos.put("calle2", calle2);
+                    datos.put("localidad", localidad);
+                    datos.put("departamento", departamento);
+
+                    // Busco en cache
+                    String cache = tsigCache.obtenerDeCache(datos);
+                    if (cache != null) {
+                        System.out.println("Cache Si");
+                        return new ResponseEntity<>(cache, headers, HttpStatus.OK);
+                    } else {
+                        System.out.println("Cache No");
+                    }
+
                     url = "https://direcciones.ide.uy/api/v0/geocode/BusquedaDireccion";
                     builder = UriComponentsBuilder.fromHttpUrl(url)
                             .queryParams(params);
@@ -522,16 +770,9 @@ public class Service {
                     // Obtener la respuesta de ResponseEntity
                     jsonString = response.getBody();
 
-                    Map<String, String> datos = new HashMap<>();
-                    datos.put("id_geocoder", "1");
-					datos.put("id_canonic_form", "2");
-					datos.put("calle", calle);
-					datos.put("numero", numero);
-					datos.put("calle2", calle2);
-					datos.put("localidad", localidad);
-					datos.put("departamento", departamento);
-					datos.put("response", jsonString);
-					tsigCache.insertarEnCache(datos);
+                    // Agrego response para guardar en cache
+                    datos.put("response", jsonString);
+                    tsigCache.insertarEnCache(datos);
 
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
@@ -570,6 +811,25 @@ public class Service {
                     params.add("calle", calleGeoCoder);
                     params.add("localidad", localidad);
                     params.add("departamento", departamento);
+
+                    // Datos para buscar en cache
+                    Map<String, String> datos = new HashMap<>();
+                    datos.put("id_geocoder", "1");
+                    datos.put("id_canonic_form", "3");
+                    datos.put("manzana", manzana);
+                    datos.put("solar", solar);
+                    datos.put("localidad", localidad);
+                    datos.put("departamento", departamento);
+
+                    // Busco en cache
+                    String cache = tsigCache.obtenerDeCache(datos);
+                    if (cache != null) {
+                        System.out.println("Cache Si");
+                        return new ResponseEntity<>(cache, headers, HttpStatus.OK);
+                    } else {
+                        System.out.println("Cache No");
+                    }
+
                     url = "https://direcciones.ide.uy/api/v0/geocode/BusquedaDireccion";
                     builder = UriComponentsBuilder.fromHttpUrl(url)
                             .queryParams(params);
@@ -587,14 +847,8 @@ public class Service {
                     // Obtener la respuesta de ResponseEntity
                     jsonString = response.getBody();
 
-                    Map<String, String> datos = new HashMap<>();
-                    datos.put("id_geocoder", "1");
-					datos.put("id_canonic_form", "3");
-					datos.put("manzana", manzana);
-					datos.put("solar", solar);
-					datos.put("localidad", localidad);
-					datos.put("departamento", departamento);
-					datos.put("response", jsonString);
+                    // Agrego response para guardar en cache
+                    datos.put("response", jsonString);
                     tsigCache.insertarEnCache(datos);
 
                     // Crear un ObjectMapper de Jackson
@@ -622,6 +876,24 @@ public class Service {
                     params.add("calle", nombreInmueble);
                     params.add("localidad", localidad);
                     params.add("departamento", departamento);
+
+                    // Datos para buscar en cache
+                    Map<String, String> datos = new HashMap<>();
+                    datos.put("id_geocoder", "1");
+                    datos.put("id_canonic_form", "4");
+                    datos.put("nombre_inmueble", nombreInmueble);
+                    datos.put("localidad", localidad);
+                    datos.put("departamento", departamento);
+
+                    // Busco en cache
+                    String cache = tsigCache.obtenerDeCache(datos);
+                    if (cache != null) {
+                        System.out.println("Cache Si");
+                        return new ResponseEntity<>(cache, headers, HttpStatus.OK);
+                    } else {
+                        System.out.println("Cache No");
+                    }
+
                     url = "https://direcciones.ide.uy/api/v0/geocode/BusquedaDireccion";
                     builder = UriComponentsBuilder.fromHttpUrl(url)
                             .queryParams(params);
@@ -636,13 +908,8 @@ public class Service {
                     // Obtener la respuesta de ResponseEntity
                     jsonString = response.getBody();
 
-                    Map<String, String> datos = new HashMap<>();
-                    datos.put("id_geocoder", "1");
-					datos.put("id_canonic_form", "4");
-					datos.put("nombre_inmueble", nombreInmueble);
-					datos.put("localidad", localidad);
-					datos.put("departamento", departamento);
-					datos.put("response", jsonString);
+                    // Agrego response para guardar en cache
+                    datos.put("response", jsonString);
                     tsigCache.insertarEnCache(datos);
 
                     // Crear un ObjectMapper de Jackson
@@ -674,6 +941,22 @@ public class Service {
                     params.add("km", kilometro.toString());
                     params.add("ruta", numeroRuta.toString());
 
+                    // Datos para buscar en cache
+                    Map<String, String> datos = new HashMap<>();
+                    datos.put("id_geocoder", "1");
+                    datos.put("id_canonic_form", "5");
+                    datos.put("numeroruta", numeroRuta.toString());
+                    datos.put("kilometro", kilometro.toString());
+
+                    // Busco en cache
+                    String cache = tsigCache.obtenerDeCache(datos);
+                    if (cache != null) {
+                        System.out.println("Cache Si");
+                        return new ResponseEntity<>(cache, headers, HttpStatus.OK);
+                    } else {
+                        System.out.println("Cache No");
+                    }
+
                     // Construir la URL con los parámetros
                     url = "https://direcciones.ide.uy/api/v1/geocode/rutakm";
                     builder = UriComponentsBuilder.fromHttpUrl(url)
@@ -689,13 +972,9 @@ public class Service {
                     // Obtener la respuesta de ResponseEntity
                     jsonString = response.getBody();
 
-                    Map<String, String> datos = new HashMap<>();
-					datos.put("id_geocoder", "1");
-					datos.put("id_canonic_form", "5");
-					datos.put("numeroruta", numeroRuta.toString());
-					datos.put("kilometro", kilometro.toString());
-                    tsigCache.insertarEnCache(datos);
+                    datos.put("response", jsonString);
 
+                    tsigCache.insertarEnCache(datos);
 
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
@@ -718,6 +997,23 @@ public class Service {
                     calleGeoCoder = calle + (numero != null ? " " + numero : "");
                     // Construir la URL con los parámetros
                     params.add("calle", calleGeoCoder);
+
+                    // Datos para buscar en cache
+                    Map<String, String> datos = new HashMap<>();
+                    datos.put("id_geocoder", "1");
+                    datos.put("id_canonic_form", "6");
+                    datos.put("calle", calle);
+                    datos.put("numero", numero);
+
+                    // Busco en cache
+                    String cache = tsigCache.obtenerDeCache(datos);
+                    if (cache != null) {
+                        System.out.println("Cache Si");
+                        return new ResponseEntity<>(cache, headers, HttpStatus.OK);
+                    } else {
+                        System.out.println("Cache No");
+                    }
+
                     builder = UriComponentsBuilder.fromHttpUrl(url)
                             .queryParams(params);
                     fullUrl = builder.toUriString();
@@ -731,6 +1027,11 @@ public class Service {
                     input = "calleGeoCoder:" + calleGeoCoder;
                     // Obtener la respuesta de ResponseEntity
                     jsonString = response.getBody();
+
+                    // Datos para guardar en cache
+                    datos.put("response", jsonString);
+                    tsigCache.insertarEnCache(datos);
+
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
                     // Analizar la cadena de texto JSON en una lista de objetos Java
@@ -762,6 +1063,23 @@ public class Service {
                     calle = Utils.RemplazarTildesYEspacios(calle);
                     params.add("street", calle + "+" + numero);
                     params.add("format", "json");
+
+                    // Datos para buscar en cache
+                    Map<String, String> datos = new HashMap<>();
+                    datos.put("id_geocoder", "2");
+                    datos.put("id_canonic_form", "6");
+                    datos.put("calle", calle);
+                    datos.put("numero", numero);
+
+                    // Busco en cache
+                    String cache = tsigCache.obtenerDeCache(datos);
+                    if (cache != null) {
+                        System.out.println("Cache Si");
+                        return new ResponseEntity<>(cache, headers, HttpStatus.OK);
+                    } else {
+                        System.out.println("Cache No");
+                    }
+
                     builder = UriComponentsBuilder.fromHttpUrl(url)
                             .queryParams(params);
                     fullUrl = builder.toUriString();
@@ -774,27 +1092,24 @@ public class Service {
                     // Obtener la respuesta del servicio externo
                     response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
 
-                    input = "calle:"+calle + ";numero:"+numero;
+                    input = "calle:" + calle + ";numero:" + numero;
                     // Obtener la respuesta de ResponseEntity
                     jsonString = response.getBody();
 
-                    Map<String, String> datos = new HashMap<>();
-                    datos.put("id_geocoder", "2");
-					datos.put("id_canonic_form", "6");
-					datos.put("calle", calle);
-					datos.put("numero", numero);
-					datos.put("response", jsonString);
+                    // Datos para guardar en cache
+                    datos.put("response", jsonString);
                     tsigCache.insertarEnCache(datos);
 
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
                     // Analizar la cadena de texto JSON en una lista de objetos Java
-                    listaObjetos = objectMapper.readValue(jsonString, new TypeReference<List<Map<String, Object>>>() {});
+                    listaObjetos = objectMapper.readValue(jsonString, new TypeReference<List<Map<String, Object>>>() {
+                    });
                     // Recorrer la lista de objetos
                     for (Map<String, Object> objeto : listaObjetos) {
                         // Acceder a los atributos de cada objeto
-                        Double lon = Double.parseDouble((String)objeto.get("lon"));
-                        Double lat = Double.parseDouble((String)objeto.get("lat"));
+                        Double lon = Double.parseDouble((String) objeto.get("lon"));
+                        Double lat = Double.parseDouble((String) objeto.get("lat"));
                         repository.insertarCoordenadas(input, "NOMINATIN", lat, lon);
 
                     }
@@ -806,6 +1121,24 @@ public class Service {
                     departamento = Utils.RemplazarTildesYEspacios(departamento);
                     params.add("q", nombreInmueble + "+" + departamento);
                     params.add("format", "json");
+
+                    // Datos para buscar en cache
+                    Map<String, String> datos = new HashMap<>();
+                    datos.put("id_geocoder", "2");
+                    datos.put("id_canonic_form", "4");
+                    datos.put("nombre_inmueble", nombreInmueble);
+                    datos.put("localidad", localidad);
+                    datos.put("departamento", departamento);
+
+                    // Busco en cache
+                    String cache = tsigCache.obtenerDeCache(datos);
+                    if (cache != null) {
+                        System.out.println("Cache Si");
+                        return new ResponseEntity<>(cache, headers, HttpStatus.OK);
+                    } else {
+                        System.out.println("Cache No");
+                    }
+
                     builder = UriComponentsBuilder.fromHttpUrl(url)
                             .queryParams(params);
                     fullUrl = builder.toUriString();
@@ -818,29 +1151,24 @@ public class Service {
                     // Obtener la respuesta del servicio externo
                     response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
 
-                    input = "nombreInmueble:"+nombreInmueble + (localidad!="" ? ";localidad:"+localidad : "");
-                    input = input + (departamento!="" ? ";departamento:"+departamento : "");
+                    input = "nombreInmueble:" + nombreInmueble + (localidad != "" ? ";localidad:" + localidad : "");
+                    input = input + (departamento != "" ? ";departamento:" + departamento : "");
                     // Obtener la respuesta de ResponseEntity
                     jsonString = response.getBody();
 
-                    Map<String, String> datos = new HashMap<>();
-                    datos.put("id_geocoder", "2");
-					datos.put("id_canonic_form", "4");
-					datos.put("nombre_inmueble", nombreInmueble);
-					datos.put("localidad", localidad);
-					datos.put("departamento", departamento);
-					datos.put("response", jsonString);
+                    datos.put("response", jsonString);
                     tsigCache.insertarEnCache(datos);
 
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
                     // Analizar la cadena de texto JSON en una lista de objetos Java
-                    listaObjetos = objectMapper.readValue(jsonString, new TypeReference<List<Map<String, Object>>>() {});
+                    listaObjetos = objectMapper.readValue(jsonString, new TypeReference<List<Map<String, Object>>>() {
+                    });
                     // Recorrer la lista de objetos
                     for (Map<String, Object> objeto : listaObjetos) {
                         // Acceder a los atributos de cada objeto
-                        Double lon = Double.parseDouble((String)objeto.get("lon"));
-                        Double lat = Double.parseDouble((String)objeto.get("lat"));
+                        Double lon = Double.parseDouble((String) objeto.get("lon"));
+                        Double lat = Double.parseDouble((String) objeto.get("lat"));
                         repository.insertarCoordenadas(input, "NOMINATIN", lat, lon);
                     }
                     return response;
@@ -859,6 +1187,23 @@ public class Service {
                 if (idFormaCanonica == 6) {// Construir la URL con los parámetros
                     calle = Utils.RemplazarTildesYEspacios(calle);
                     params.add("q", calle + "+" + numero);
+
+                    // Datos para buscar en cache
+                    Map<String, String> datos = new HashMap<>();
+                    datos.put("id_geocoder", "3");
+                    datos.put("id_canonic_form", "6");
+                    datos.put("calle", calle);
+                    datos.put("numero", numero);
+
+                    // Busco en cache
+                    String cache = tsigCache.obtenerDeCache(datos);
+                    if (cache != null) {
+                        System.out.println("Cache Si");
+                        return new ResponseEntity<>(cache, headers, HttpStatus.OK);
+                    } else {
+                        System.out.println("Cache No");
+                    }
+
                     builder = UriComponentsBuilder.fromHttpUrl(url)
                             .queryParams(params);
                     fullUrl = builder.toUriString();
@@ -875,11 +1220,7 @@ public class Service {
                     // Obtener la respuesta de ResponseEntity
                     jsonString = response.getBody();
 
-                    Map<String, String> datos = new HashMap<>();
-                    datos.put("id_geocoder", "3");
-                    datos.put("id_canonic_form", "6");
-                    datos.put("calle", calle);
-                    datos.put("numero", numero);
+                    // Datos para guardar en cache
                     datos.put("response", jsonString);
                     tsigCache.insertarEnCache(datos);
 
@@ -977,7 +1318,7 @@ public class Service {
         String input = entrada;
         entrada = Utils.RemplazarTildesYEspacios(entrada);
         params.add("q", entrada);
-        params.add("format","json");
+        params.add("format", "json");
         // Construir la URL con los parámetros
         String url = "https://nominatim.openstreetmap.org/search";
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url)
@@ -998,8 +1339,8 @@ public class Service {
         // Recorrer la lista de objetos
         for (Map<String, Object> objeto : listaObjetos) {
             // Acceder a los atributos de cada objeto
-            Double lon = Double.parseDouble((String)objeto.get("lon"));
-            Double lat = Double.parseDouble((String)objeto.get("lat"));
+            Double lon = Double.parseDouble((String) objeto.get("lon"));
+            Double lat = Double.parseDouble((String) objeto.get("lat"));
             repository.insertarCoordenadas(input, "NOMINATIM", lat, lon);
         }
         return response;
