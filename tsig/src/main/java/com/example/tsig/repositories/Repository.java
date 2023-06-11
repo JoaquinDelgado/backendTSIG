@@ -46,7 +46,7 @@ public class Repository {
         return geoCoders;
     }
 
-    public void insertarBusquedaEnCahe(Map<String,String> params) {
+    public void insertarBusquedaEnCache(Map<String,String> params) {
 
         String queryInsertar = 
         "INSERT INTO public.cache_busqueda "+

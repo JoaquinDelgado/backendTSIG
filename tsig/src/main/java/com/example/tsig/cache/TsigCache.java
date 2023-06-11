@@ -16,7 +16,7 @@ public class TsigCache {
     private Repository repository;
 
     public void insertarEnCahe(Map<String,String> params) {
-        repository.insertarBusquedaEnCahe(params);
+        repository.insertarBusquedaEnCache(params);
     }
     
 }
