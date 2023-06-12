@@ -1263,6 +1263,15 @@ public class Service {
         if (todos != null) {
             params.add("todos", todos.toString());
         }
+
+        String cache = tsigCache.obtenerDeCacheSugerencia(entrada, todos);
+        if (cache != null) {
+            System.out.println("Cache Si");
+            return new ResponseEntity<>(cache, headers, HttpStatus.OK);
+        } else {
+            System.out.println("Cache No");
+        }
+
         // Construir la URL con los parámetros
         String url = "https://direcciones.ide.uy/api/v0/geocode/SugerenciaCalleCompleta";
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url)
@@ -1273,7 +1282,13 @@ public class Service {
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         // Obtener la respuesta del servicio externo
-        return restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+
+        String jsonString = response.getBody();
+
+        tsigCache.insertarEnCacheSugerencia(entrada, todos, jsonString);
+
+        return response;
     }
 
     public ResponseEntity<String> direcEnPoligono(Integer limit, String poligono, String tipoDirec) {

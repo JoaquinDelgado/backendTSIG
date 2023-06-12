@@ -5,38 +5,44 @@ http://localhost:8080/swagger-ui/index.html
 
 Pasos para poder establecer conexion con base de datos
 
-1) Descargarse el PostgresQL 15 del siguiente link: https://sbp.enterprisedb.com/getfile.jsp?fileid=1258478 e instalarlo
-2) Abrir con el pgAdmin4 y crear una tabla ejecutando el siguiente script: 
-   1) CREATE TABLE IF NOT EXISTS public.audits
+1. Descargarse el PostgresQL 15 del siguiente link: https://sbp.enterprisedb.com/getfile.jsp?fileid=1258478 e instalarlo
+2. Abrir con el pgAdmin4 y crear una tabla ejecutando el siguiente script:
+
+   1. CREATE TABLE IF NOT EXISTS public.audits
       (
-      id serial PRIMARY KEY,
-      input character varying,
-      geocoder character varying,
-      latitud double precision,
-      longitud double precision
+         id serial PRIMARY KEY,
+         input character varying,
+         geocoder character varying,
+         latitud double precision,
+         longitud double precision
       );
-      
       CREATE TABLE IF NOT EXISTS public.cache_busqueda
       (
-	id SERIAL PRIMARY KEY,
-	id_geocoder integer,
-	id_canonic_form integer,
-	calle character varying COLLATE pg_catalog."default",
-	numero character varying COLLATE pg_catalog."default",
-	localidad character varying COLLATE pg_catalog."default",
-	departamento character varying COLLATE pg_catalog."default",
-	calle2 character varying COLLATE pg_catalog."default",
-	manzana character varying COLLATE pg_catalog."default",
-	solar character varying COLLATE pg_catalog."default",
-	nombre_inmueble character varying COLLATE pg_catalog."default",
-	numeroRuta character varying COLLATE pg_catalog."default",
-	kilometro character varying COLLATE pg_catalog."default",
-	response character varying COLLATE pg_catalog."default",
-	fecha_creado timestamp
-	);
+         id SERIAL PRIMARY KEY,
+         id_geocoder integer,
+         id_canonic_form integer,
+         calle character varying COLLATE pg_catalog."default",
+         numero character varying COLLATE pg_catalog."default",
+         localidad character varying COLLATE pg_catalog."default",
+         departamento character varying COLLATE pg_catalog."default",
+         calle2 character varying COLLATE pg_catalog."default",
+         manzana character varying COLLATE pg_catalog."default",
+         solar character varying COLLATE pg_catalog."default",
+         nombre_inmueble character varying COLLATE pg_catalog."default",
+         numeroRuta character varying COLLATE pg_catalog."default",
+         kilometro character varying COLLATE pg_catalog."default",
+         response character varying COLLATE pg_catalog."default",
+         fecha_creado timestamp
+      );
+      CREATE TABLE IF NOT EXISTS public.cache_sugerencias (
+         id SERIAL PRIMARY KEY,
+         entrada character varying COLLATE pg_catalog."default",
+         todos char(1),
+         response character varying COLLATE pg_catalog."default",
+         fecha_creado timestamp
+      );
 
-
-3) En el application.properties deben colocar lo siguiente:
+3. En el application.properties deben colocar lo siguiente:
    spring.datasource.url=jdbc:postgresql://localhost:5432/tsig
 
    spring.datasource.username=postgres
@@ -50,28 +56,29 @@ Donde dice "postgres" el nombre de su usuario
 Donde dice "password" su contraseña
 
 Levantar backend utilizando DOCKER
-   1) Se necesita docker instalado
-   2) Dentro de la rais del proyecto ejecutar docker-compose up o docker-compose up -d (para ejecutar en segundo plano)
-      2.1) Se crea contenedor para base de datos postgres, puerto 5432, crea bd: tsig_2023 user:tsig pass: tsig y agrega tablas
-      2.2) Se crea contenedor para pgadmin web, http://localhost:5050/, usuario:pgadmin@tsig.com pass: tsig. Para agregar conexion Host name/Address: postgress
-      2.2) Se crea contendor para backend, http://localhost:8080/api/
-   3) Para bajar contenedores docker-compose down, para bajar y borrar docker-compose down --rmi all
-   4) Posibles errores
-      4.1) Puertos bloqueados, se pueden cambiar en el archivo docker-compose.yml
-      4.2) Borrar directorio data
+
+1.  Se necesita docker instalado
+2.  Dentro de la rais del proyecto ejecutar docker-compose up o docker-compose up -d (para ejecutar en segundo plano)
+    2.1) Se crea contenedor para base de datos postgres, puerto 5432, crea bd: tsig_2023 user:tsig pass: tsig y agrega tablas
+    2.2) Se crea contenedor para pgadmin web, http://localhost:5050/, usuario:pgadmin@tsig.com pass: tsig. Para agregar conexion Host name/Address: postgress
+    2.2) Se crea contendor para backend, http://localhost:8080/api/
+3.  Para bajar contenedores docker-compose down, para bajar y borrar docker-compose down --rmi all
+4.  Posibles errores
+    4.1) Puertos bloqueados, se pueden cambiar en el archivo docker-compose.yml
+    4.2) Borrar directorio data
 
 CREATE TABLE IF NOT EXISTS public.geocoders
 (
-id integer NOT NULL DEFAULT nextval('geocoders_id_seq'::regclass),
-geocoder character varying COLLATE pg_catalog."default",
-CONSTRAINT geocoders_pkey PRIMARY KEY (id)
+   id integer NOT NULL DEFAULT nextval('geocoders_id_seq'::regclass),
+   geocoder character varying COLLATE pg_catalog."default",
+   CONSTRAINT geocoders_pkey PRIMARY KEY (id)
 )
 
 CREATE TABLE IF NOT EXISTS public.canonic_forms
 (
-id integer NOT NULL DEFAULT nextval('canonic_forms_id_seq'::regclass),
-canonic_form character varying COLLATE pg_catalog."default",
-CONSTRAINT canonic_forms_pkey PRIMARY KEY (id)
+   id integer NOT NULL DEFAULT nextval('canonic_forms_id_seq'::regclass),
+   canonic_form character varying COLLATE pg_catalog."default",
+   CONSTRAINT canonic_forms_pkey PRIMARY KEY (id)
 )
 
 INSERT INTO public.geocoders(

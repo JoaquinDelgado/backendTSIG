@@ -104,4 +104,34 @@ public class Repository {
         }
         return query;
     }
+
+    public void insertarEnCacheSugerencia(String entrada, Boolean todos, String response){
+        String queryInsertar = "INSERT INTO public.cache_sugerencias " +
+                "(entrada, todos, response,fecha_creado) " +
+                "VALUES " +
+                "(:entrada, :todos, :response, CURRENT_TIMESTAMP) ";
+        queryInsertar=queryInsertar.replace(":entrada", "'"+entrada.toUpperCase()+"'");  
+        String todosString = todos ? "t" : "f"; 
+        queryInsertar=queryInsertar.replace(":todos", "'"+todosString+"'");  
+        queryInsertar=queryInsertar.replace(":response", "'"+response+"'");   
+        int rows = jdbcTemplate.update(queryInsertar);
+        if (rows > 0) {
+            System.out.println("A new row has been inserted.");
+        }
+    }
+
+    public String obtenerSugernciaDeCache(String entrada, Boolean todos){
+        String queryObtener = "SELECT response FROM public.cache_sugerencias " +
+                "WHERE entrada = :entrada " +
+                "AND todos = :todos ";
+        queryObtener=queryObtener.replace(":entrada", "'"+entrada.toUpperCase()+"'");  
+        String todosString = todos ? "t" : "f"; 
+        queryObtener=queryObtener.replace(":todos", "'"+todosString+"'");  
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(queryObtener);
+        if (rows.size() > 0) {
+            return (String) rows.get(0).get("response");
+        } else {
+            return null;
+        }
+    }
 }

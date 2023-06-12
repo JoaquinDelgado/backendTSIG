@@ -22,5 +22,13 @@ public class TsigCache {
         return repository.obtenerBusquedaDeCache(params);
     }
 
+    public void insertarEnCacheSugerencia(String entrada, Boolean todos, String respuesta) {
+        repository.insertarEnCacheSugerencia(entrada, todos, respuesta);
+    }
+
+    public String obtenerDeCacheSugerencia(String entrada, Boolean todos) {
+        return repository.obtenerSugernciaDeCache(entrada, todos);
+    }
+
     
 }
