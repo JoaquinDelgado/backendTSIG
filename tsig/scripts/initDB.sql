@@ -69,3 +69,12 @@ CREATE TABLE IF NOT EXISTS public.cache_busqueda (
   response character varying COLLATE pg_catalog."default",
   fecha_creado timestamp
 );
+
+CREATE TABLE IF NOT EXISTS public.cache_sugerencias (
+  id SERIAL PRIMARY KEY,
+  entrada character varying COLLATE pg_catalog."default",
+  todos char(1),
+  response character varying COLLATE pg_catalog."default",
+  fecha_creado timestamp
+
+);
