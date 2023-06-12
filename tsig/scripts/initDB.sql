@@ -76,5 +76,4 @@ CREATE TABLE IF NOT EXISTS public.cache_sugerencias (
   todos char(1),
   response character varying COLLATE pg_catalog."default",
   fecha_creado timestamp
-
 );
