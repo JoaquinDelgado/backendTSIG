@@ -1,13 +1,8 @@
 package com.example.tsig.models.ide;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-    @Getter
-    @Setter
+    @Data
     public class Numero {
         private Integer nro_puerta;
-
-        public Numero() {
-        }
     }

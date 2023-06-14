@@ -1,10 +1,10 @@
 package com.example.tsig.models.ide;
 
-import lombok.Getter;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Data;
 
-    @Getter
-    @Setter
+    @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public class Direccion {
         private Departamento departamento;
         private Localidad localidad;
@@ -12,8 +12,5 @@ import lombok.Setter;
         private Numero numero;
         private Integer manzana;
         private Integer solar;
-
-        public Direccion() {
-        }
-
+        private Inmueble inmueble;
     }

@@ -11,8 +11,8 @@ import lombok.Setter;
 public class ModeloDireccionNominatin {
 
     private Integer place_id;
-    private Float lat;
-    private Float lon;
+    private Double lat;
+    private Double lon;
     private String display_name;
     
     public ModeloDireccionNominatin() {
