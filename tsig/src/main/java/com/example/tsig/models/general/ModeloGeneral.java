@@ -16,7 +16,7 @@ public class ModeloGeneral {
     private String departamento;
     private String localidad;
     private Integer codigoPostal;
-    private Float latitud;
-    private Float longitud;
+    private Double latitud;
+    private Double longitud;
     
 }

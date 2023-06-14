@@ -14,6 +14,6 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Geometry {
 
-    private Float [] coordinates;
+    private Double [] coordinates;
     
 }

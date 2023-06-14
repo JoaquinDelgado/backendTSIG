@@ -1,15 +1,9 @@
 package com.example.tsig.models.ide;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-    @Getter
-    @Setter
+    @Data
     public class Inmueble {
         private Integer idPuntoNotable;
         private String nombre;
-
-        public Inmueble() {
-        }
-
     }
