@@ -12,8 +12,8 @@ public class ModeloDireccionIde {
     private Direccion direccion;
     private Integer codigoPostal;
     private Integer codigoPostalAmpliado;
-    private Float puntoX;
-    private Float puntoY;
+    private Double puntoX;
+    private Double puntoY;
     private Integer idPunto;
     private Integer srid;
     private Integer idTipoClasificacion;

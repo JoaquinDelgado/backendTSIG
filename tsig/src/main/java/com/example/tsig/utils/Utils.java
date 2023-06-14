@@ -2,6 +2,7 @@ package com.example.tsig.utils;
 
 import com.example.tsig.models.general.ModeloGeneral;
 import com.example.tsig.models.ide.ModeloDireccionIde;
+import com.example.tsig.models.ide.ModeloRutaKmIde;
 import com.example.tsig.models.nominatim.ModeloDireccionNominatin;
 import com.example.tsig.models.photon.ModeloDireccionPhoton;
 
@@ -19,14 +20,26 @@ public class Utils {
     }
 
     public static ModeloGeneral direccionIdeToModeloGeneral(ModeloDireccionIde dirIde) {
-        ModeloGeneral mg = new ModeloGeneral("IDE",
-                dirIde.getDireccion().getCalle()!=null ?  dirIde.getDireccion().getCalle().getNombre_normalizado() :   dirIde.getDireccion().getDepartamento().getNombre_normalizado() +" "+dirIde.getDireccion().getLocalidad().getNombre_normalizado(),
+        String numero = dirIde.getDireccion().getNumero() != null ? " " + dirIde.getDireccion().getNumero().getNro_puerta().toString() : "";
+        String calleTemp = dirIde.getDireccion().getCalle() != null ? dirIde.getDireccion().getCalle().getNombre_normalizado() + numero : dirIde.getDireccion().getDepartamento().getNombre_normalizado() +" "+dirIde.getDireccion().getLocalidad().getNombre_normalizado();
+        String calleDefinitivo = dirIde.getDireccion().getInmueble() != null ? dirIde.getDireccion().getInmueble().getNombre() + ", " + calleTemp : calleTemp;
+        return new ModeloGeneral("IDE",
+                calleDefinitivo,
                 dirIde.getDireccion().getDepartamento().getNombre_normalizado(),
                 dirIde.getDireccion().getLocalidad().getNombre_normalizado(),
                 dirIde.getCodigoPostal(),
                 dirIde.getPuntoY(),
                 dirIde.getPuntoX());
-        return mg;
+    }
+
+    public static ModeloGeneral rutaKmIdeToModeloGeneral(ModeloRutaKmIde rutaKmIde) {
+        return new ModeloGeneral("IDE",
+                rutaKmIde.getAddress(),
+                rutaKmIde.getDepartamento(),
+                rutaKmIde.getLocalidad(),
+                rutaKmIde.getPostalCode(),
+                rutaKmIde.getLat(),
+                rutaKmIde.getLng());
     }
 
     public static ModeloGeneral direccionNominatimToModeloGeneral(ModeloDireccionNominatin dirNominatin) {
