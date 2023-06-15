@@ -242,7 +242,7 @@ public class Service {
                     if (solar == null) {
                         return new ResponseEntity<>("Solar no puede ser vacio", headers, HttpStatus.BAD_REQUEST);
                     }
-                    calleGeoCoder = calle != null ? calle + " " : "" + "manzana " + manzana + " solar " + solar;
+                    calleGeoCoder = manzana + " " + solar;
                     params.add("calle", calleGeoCoder);
                     params.add("localidad", localidad);
                     params.add("departamento", departamento);
@@ -914,7 +914,7 @@ public class Service {
                     if (solar == null) {
                         return new ResponseEntity<>("Solar no puede ser vacio", headers, HttpStatus.BAD_REQUEST);
                     }
-                    calleGeoCoder = "manzana " + manzana + " solar " + solar;
+                    calleGeoCoder = manzana + " " + solar;
                     params.add("calle", calleGeoCoder);
                     params.add("localidad", localidad);
                     params.add("departamento", departamento);
