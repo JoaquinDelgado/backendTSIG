@@ -27,7 +27,7 @@ public class TsigCache {
     }
 
     public String obtenerDeCacheSugerencia(String entrada, Boolean todos) {
-        return repository.obtenerSugernciaDeCache(entrada, todos);
+        return repository.obtenerSugerenciaDeCache(entrada, todos);
     }
 
     
