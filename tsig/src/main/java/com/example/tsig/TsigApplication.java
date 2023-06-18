@@ -101,4 +101,13 @@ class DireccionesController {
 			@RequestParam(value = "entrada") String entrada) throws JsonProcessingException {
 		return service.busquedaSimple(entrada);
 	}
+
+	@GetMapping("/reverse")
+	@CrossOrigin(origins = "*") // Permitir todas las IPs
+	public ResponseEntity<String> reverse(
+			@RequestParam(value = "latitud") Double latitud,
+			@RequestParam(value = "longitud") Double longitud,
+			@RequestParam(value = "limit", required = false) Integer limit) throws JsonProcessingException {
+		return service.reverse(latitud, longitud, limit);
+	}
 }
