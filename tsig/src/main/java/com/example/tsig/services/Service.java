@@ -1542,4 +1542,36 @@ public class Service {
         }
         return response;
     }
+
+    public ResponseEntity<String> reverse(Double latitud, Double longitud, Integer limit) {
+        RestTemplate restTemplate = new RestTemplate();
+
+        // Configurar los encabezados de la solicitud
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        // Agregar otros encabezados si es necesario
+
+        // Construir los parámetros
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("latitud", latitud.toString());
+        params.add("longitud", longitud.toString());
+        if (limit != null) {
+            params.add("limit", limit.toString());
+        }
+        // Construir la URL con los parámetros
+        String url = "https://direcciones.ide.uy/api/v1/geocode/reverse";
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url)
+                .queryParams(params);
+        String fullUrl = builder.toUriString();
+
+        // Crear una entidad HttpEntity con los encabezados
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        // Obtener la respuesta del servicio externo
+        ResponseEntity<String> response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+
+        String jsonString = response.getBody();
+
+        return response;
+    }
 }
