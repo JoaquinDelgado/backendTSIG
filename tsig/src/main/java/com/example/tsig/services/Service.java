@@ -1442,11 +1442,8 @@ public class Service {
         // Construir los parámetros
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("entrada", entrada);
-        if (todos != null) {
-            params.add("todos", todos.toString());
-        }
-
-        String cache = tsigCache.obtenerDeCacheSugerencia(entrada, todos);
+        params.add("todos", todos != null ? todos.toString() : "false");
+        String cache = tsigCache.obtenerDeCacheSugerencia(entrada, (todos != null) ? todos : false);
         if (cache != null) {
             System.out.println("Cache Si");
             return new ResponseEntity<>(cache, headers, HttpStatus.OK);
@@ -1468,7 +1465,7 @@ public class Service {
 
         String jsonString = response.getBody();
 
-        tsigCache.insertarEnCacheSugerencia(entrada, todos, jsonString);
+        tsigCache.insertarEnCacheSugerencia(entrada, (todos != null) ? todos : false, jsonString);
 
         return response;
     }

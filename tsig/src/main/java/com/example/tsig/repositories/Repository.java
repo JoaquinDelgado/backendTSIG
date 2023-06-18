@@ -120,7 +120,7 @@ public class Repository {
         }
     }
 
-    public String obtenerSugernciaDeCache(String entrada, Boolean todos){
+    public String obtenerSugerenciaDeCache(String entrada, Boolean todos){
         String queryObtener = "SELECT response FROM public.cache_sugerencias " +
                 "WHERE entrada = :entrada " +
                 "AND todos = :todos ";
