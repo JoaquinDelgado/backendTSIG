@@ -1672,7 +1672,7 @@ public class Service {
                 direccionCombinada.setDepartamento(modeloGeneral.getDepartamento());
                 // Agregi geocoder a lista de geocoders
                 List<String> listaNombres = new ArrayList<String>(Arrays.asList(direccionCombinada.getGeoCoders()));
-                listaNombres.add("IDE");
+                listaNombres.add("ide");
                 direccionCombinada.setGeoCoders(listaNombres.toArray(new String[0]));
 
                 DireccionGeoCodificador ide = new DireccionGeoCodificador();
@@ -1697,7 +1697,7 @@ public class Service {
                         // Agregi geocoder a lista de geocoders
                         List<String> listaNombres = new ArrayList<String>(
                                 Arrays.asList(direccionesCombinada.getGeoCoders()));
-                        listaNombres.add("PHOTON");
+                        listaNombres.add("photon");
                         direccionesCombinada.setGeoCoders(listaNombres.toArray(new String[0]));
 
                         DireccionGeoCodificador photon = new DireccionGeoCodificador();
@@ -1722,7 +1722,7 @@ public class Service {
                     direccionCombinada.setDepartamento(modeloGeneral.getDepartamento());
                     // Agrego geocoder a lista de geocoders
                     List<String> listaNombres = new ArrayList<String>(Arrays.asList(direccionCombinada.getGeoCoders()));
-                    listaNombres.add("Photon");
+                    listaNombres.add("photon");
                     direccionCombinada.setGeoCoders(listaNombres.toArray(new String[0]));
 
                     DireccionGeoCodificador photon = new DireccionGeoCodificador();
@@ -1748,7 +1748,7 @@ public class Service {
                         // Agregi geocoder a lista de geocoders
                         List<String> listaNombres = new ArrayList<String>(
                                 Arrays.asList(direccionesCombinada.getGeoCoders()));
-                        listaNombres.add("NOMINATIM");
+                        listaNombres.add("nominatim");
                         direccionesCombinada.setGeoCoders(listaNombres.toArray(new String[0]));
 
                         DireccionGeoCodificador nominatim = new DireccionGeoCodificador();
@@ -1773,7 +1773,7 @@ public class Service {
                     direccionCombinada.setDepartamento(modeloGeneral.getDepartamento());
                     // Agrego geocoder a lista de geocoders
                     List<String> listaNombres = new ArrayList<String>(Arrays.asList(direccionCombinada.getGeoCoders()));
-                    listaNombres.add("NOMINATIM");
+                    listaNombres.add("nominatim");
                     direccionCombinada.setGeoCoders(listaNombres.toArray(new String[0]));
 
                     DireccionGeoCodificador nominatim = new DireccionGeoCodificador();
