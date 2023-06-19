@@ -11,6 +11,7 @@ public class Properties {
     private String postcode;
     private String housenumber;
     private String street;
+    private String name;
     private String district;
     private String state;
 }
