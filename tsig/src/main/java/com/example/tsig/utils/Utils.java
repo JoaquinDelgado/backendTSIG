@@ -104,9 +104,9 @@ public class Utils {
             if (matches.length >= 3) {
                 departamento = matches[matches.length - 3].trim();
             }
-            if(departamento.equalsIgnoreCase(mg2.getDepartamento())){
+            if(!departamento.equalsIgnoreCase(mg2.getDepartamento())){
                 return false;
-        } 
+            } 
         }
 
         if(mg1.getDepartamento()!=null && !mg1.getDepartamento().equalsIgnoreCase(mg2.getDepartamento())){
