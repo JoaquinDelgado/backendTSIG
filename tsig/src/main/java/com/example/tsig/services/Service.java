@@ -6,6 +6,8 @@ import com.example.tsig.models.ide.ModeloDireccionIde;
 import com.example.tsig.models.ide.ModeloRutaKmIde;
 import com.example.tsig.models.nominatim.ModeloDireccionNominatin;
 import com.example.tsig.models.photon.ModeloDireccionPhoton;
+import com.example.tsig.models.resultadocombinado.DireccionCombinada;
+import com.example.tsig.models.resultadocombinado.DireccionGeoCodificador;
 import com.example.tsig.repositories.Repository;
 import com.example.tsig.utils.Utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -23,6 +25,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -96,9 +99,11 @@ public class Service {
                     String cache = tsigCache.obtenerDeCache(datos);
                     if (cache != null) {
                         System.out.println("Cache Si");
-                        List<ModeloDireccionIde> res = objectMapper.readValue(cache, new TypeReference<List<ModeloDireccionIde>>() {});
+                        List<ModeloDireccionIde> res = objectMapper.readValue(cache,
+                                new TypeReference<List<ModeloDireccionIde>>() {
+                                });
                         List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
-                        for(ModeloDireccionIde ide : res){
+                        for (ModeloDireccionIde ide : res) {
                             resultado.add(Utils.direccionIdeToModeloGeneral(ide));
                         }
                         return new ResponseEntity<>(resultado, headers, HttpStatus.OK);
@@ -125,7 +130,9 @@ public class Service {
 
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
-                    List<ModeloDireccionIde> res = objectMapper.readValue(jsonString, new TypeReference<List<ModeloDireccionIde>>() {});
+                    List<ModeloDireccionIde> res = objectMapper.readValue(jsonString,
+                            new TypeReference<List<ModeloDireccionIde>>() {
+                            });
                     // Analizar la cadena de texto JSON en una lista de objetos Java
                     listaObjetos = objectMapper.readValue(jsonString, new TypeReference<>() {
                     });
@@ -140,10 +147,10 @@ public class Service {
                         }
                     }
                     List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
-                    for(ModeloDireccionIde ide : res){
+                    for (ModeloDireccionIde ide : res) {
                         resultado.add(Utils.direccionIdeToModeloGeneral(ide));
                     }
-                    return new ResponseEntity< List<ModeloGeneral>>(resultado, headers,HttpStatus.OK);
+                    return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
                 }
                 case 2 -> {
                     if (calle == null) {
@@ -172,12 +179,14 @@ public class Service {
                     String cache = tsigCache.obtenerDeCache(datos);
                     if (cache != null) {
                         System.out.println("Cache Si");
-                        List<ModeloDireccionIde> res = objectMapper.readValue(cache, new TypeReference<List<ModeloDireccionIde>>() {});
+                        List<ModeloDireccionIde> res = objectMapper.readValue(cache,
+                                new TypeReference<List<ModeloDireccionIde>>() {
+                                });
                         List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
-                        for(ModeloDireccionIde ide : res){
+                        for (ModeloDireccionIde ide : res) {
                             resultado.add(Utils.direccionIdeToModeloGeneral(ide));
                         }
-                        return new ResponseEntity< List<ModeloGeneral>>(resultado, headers,HttpStatus.OK);
+                        return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
                     } else {
                         System.out.println("Cache No");
                     }
@@ -206,7 +215,9 @@ public class Service {
 
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
-                    List<ModeloDireccionIde> res = objectMapper.readValue(jsonString, new TypeReference<List<ModeloDireccionIde>>() {});
+                    List<ModeloDireccionIde> res = objectMapper.readValue(jsonString,
+                            new TypeReference<List<ModeloDireccionIde>>() {
+                            });
                     // Analizar la cadena de texto JSON en una lista de objetos Java
                     listaObjetos = objectMapper.readValue(jsonString, new TypeReference<>() {
                     });
@@ -221,10 +232,10 @@ public class Service {
                         }
                     }
                     List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
-                    for(ModeloDireccionIde ide : res){
+                    for (ModeloDireccionIde ide : res) {
                         resultado.add(Utils.direccionIdeToModeloGeneral(ide));
                     }
-                    return new ResponseEntity< List<ModeloGeneral>>(resultado, headers,HttpStatus.OK);
+                    return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
                 }
                 case 3 -> {
                     if (departamento == null) {
@@ -260,12 +271,14 @@ public class Service {
                     String cache = tsigCache.obtenerDeCache(datos);
                     if (cache != null) {
                         System.out.println("Cache Si");
-                        List<ModeloDireccionIde> res = objectMapper.readValue(cache, new TypeReference<List<ModeloDireccionIde>>() {});
+                        List<ModeloDireccionIde> res = objectMapper.readValue(cache,
+                                new TypeReference<List<ModeloDireccionIde>>() {
+                                });
                         List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
-                        for(ModeloDireccionIde ide : res){
+                        for (ModeloDireccionIde ide : res) {
                             resultado.add(Utils.direccionIdeToModeloGeneral(ide));
                         }
-                        return new ResponseEntity< List<ModeloGeneral>>(resultado, headers,HttpStatus.OK);
+                        return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
                     } else {
                         System.out.println("Cache No");
                     }
@@ -293,7 +306,9 @@ public class Service {
 
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
-                    List<ModeloDireccionIde> res = objectMapper.readValue(jsonString, new TypeReference<List<ModeloDireccionIde>>() {});
+                    List<ModeloDireccionIde> res = objectMapper.readValue(jsonString,
+                            new TypeReference<List<ModeloDireccionIde>>() {
+                            });
                     // Analizar la cadena de texto JSON en una lista de objetos Java
                     listaObjetos = objectMapper.readValue(jsonString, new TypeReference<List<Map<String, Object>>>() {
                     });
@@ -308,10 +323,10 @@ public class Service {
                         }
                     }
                     List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
-                    for(ModeloDireccionIde ide : res){
+                    for (ModeloDireccionIde ide : res) {
                         resultado.add(Utils.direccionIdeToModeloGeneral(ide));
                     }
-                    return new ResponseEntity< List<ModeloGeneral>>(resultado, headers,HttpStatus.OK);
+                    return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
                 }
                 case 4 -> {
                     // IDE
@@ -335,8 +350,10 @@ public class Service {
                     List<ModeloGeneral> ideResultado = new ArrayList<>();
                     if (cache != null) {
                         System.out.println("Cache Si");
-                        List<ModeloDireccionIde> res = objectMapper.readValue(cache, new TypeReference<List<ModeloDireccionIde>>() {});
-                        for(ModeloDireccionIde ide : res){
+                        List<ModeloDireccionIde> res = objectMapper.readValue(cache,
+                                new TypeReference<List<ModeloDireccionIde>>() {
+                                });
+                        for (ModeloDireccionIde ide : res) {
                             ideResultado.add(Utils.direccionIdeToModeloGeneral(ide));
                         }
                     } else {
@@ -377,7 +394,7 @@ public class Service {
                                 repository.insertarCoordenadas(input, "IDE", lat, lon);
                             }
                         }
-                        for(ModeloDireccionIde ide : res){
+                        for (ModeloDireccionIde ide : res) {
                             ideResultado.add(Utils.direccionIdeToModeloGeneral(ide));
                         }
                     }
@@ -402,8 +419,10 @@ public class Service {
                     List<ModeloGeneral> nominatimResultado = new ArrayList<ModeloGeneral>();
                     if (cache != null) {
                         System.out.println("Cache Si");
-                        List<ModeloDireccionNominatin> myObjects = objectMapper.readValue(cache, new TypeReference<List<ModeloDireccionNominatin>>() {});
-                        for(ModeloDireccionNominatin  nom : myObjects){
+                        List<ModeloDireccionNominatin> myObjects = objectMapper.readValue(cache,
+                                new TypeReference<List<ModeloDireccionNominatin>>() {
+                                });
+                        for (ModeloDireccionNominatin nom : myObjects) {
                             nominatimResultado.add(Utils.direccionNominatimToModeloGeneral(nom));
                         }
                     } else {
@@ -442,9 +461,10 @@ public class Service {
                             Double lat = Double.parseDouble((String) objeto.get("lat"));
                             repository.insertarCoordenadas(input, "NOMINATIN", lat, lon);
                         }
-                        List<ModeloDireccionNominatin> myObjects = objectMapper.readValue(nominatimJsonString, new TypeReference<>() {
-                        });
-                        for(ModeloDireccionNominatin  nom : myObjects){
+                        List<ModeloDireccionNominatin> myObjects = objectMapper.readValue(nominatimJsonString,
+                                new TypeReference<>() {
+                                });
+                        for (ModeloDireccionNominatin nom : myObjects) {
                             nominatimResultado.add(Utils.direccionNominatimToModeloGeneral(nom));
                         }
                     }
@@ -482,7 +502,7 @@ public class Service {
                         List<ModeloRutaKmIde> res = objectMapper.readValue(cache, new TypeReference<>() {
                         });
                         List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
-                        for(ModeloRutaKmIde ide : res){
+                        for (ModeloRutaKmIde ide : res) {
                             resultado.add(Utils.rutaKmIdeToModeloGeneral(ide));
                         }
                         return new ResponseEntity<>(resultado, headers, HttpStatus.OK);
@@ -524,7 +544,7 @@ public class Service {
                         repository.insertarCoordenadas(input, "IDE", lat, lon);
                     }
                     List<ModeloGeneral> resultado = new ArrayList<>();
-                    for(ModeloRutaKmIde ide : res){
+                    for (ModeloRutaKmIde ide : res) {
                         resultado.add(Utils.rutaKmIdeToModeloGeneral(ide));
                     }
                     return new ResponseEntity<>(resultado, headers, HttpStatus.OK);
@@ -550,8 +570,10 @@ public class Service {
                     List<ModeloGeneral> ideResultado = new ArrayList<>();
                     if (cache != null) {
                         System.out.println("Cache Si");
-                        List<ModeloDireccionIde> res = objectMapper.readValue(cache, new TypeReference<List<ModeloDireccionIde>>() {});
-                        for(ModeloDireccionIde ide : res){
+                        List<ModeloDireccionIde> res = objectMapper.readValue(cache,
+                                new TypeReference<List<ModeloDireccionIde>>() {
+                                });
+                        for (ModeloDireccionIde ide : res) {
                             ideResultado.add(Utils.direccionIdeToModeloGeneral(ide));
                         }
                     } else {
@@ -577,7 +599,9 @@ public class Service {
 
                         // Crear un ObjectMapper de Jackson
                         objectMapper = new ObjectMapper();
-                        List<ModeloDireccionIde> res = objectMapper.readValue(jsonString, new TypeReference<List<ModeloDireccionIde>>() {});
+                        List<ModeloDireccionIde> res = objectMapper.readValue(jsonString,
+                                new TypeReference<List<ModeloDireccionIde>>() {
+                                });
                         // Analizar la cadena de texto JSON en una lista de objetos Java
                         listaObjetos = objectMapper.readValue(jsonString, new TypeReference<>() {
                         });
@@ -591,7 +615,7 @@ public class Service {
                                 repository.insertarCoordenadas(input, "IDE", lat, lon);
                             }
                         }
-                        for(ModeloDireccionIde ide : res){
+                        for (ModeloDireccionIde ide : res) {
                             ideResultado.add(Utils.direccionIdeToModeloGeneral(ide));
                         }
 
@@ -615,8 +639,10 @@ public class Service {
                     List<ModeloGeneral> nominatimResultado = new ArrayList<ModeloGeneral>();
                     if (cache != null) {
                         System.out.println("Cache Si");
-                        List<ModeloDireccionNominatin> myObjects = objectMapper.readValue(cache, new TypeReference<List<ModeloDireccionNominatin>>() {});
-                        for(ModeloDireccionNominatin  nom : myObjects){
+                        List<ModeloDireccionNominatin> myObjects = objectMapper.readValue(cache,
+                                new TypeReference<List<ModeloDireccionNominatin>>() {
+                                });
+                        for (ModeloDireccionNominatin nom : myObjects) {
                             nominatimResultado.add(Utils.direccionNominatimToModeloGeneral(nom));
                         }
                     } else {
@@ -653,9 +679,10 @@ public class Service {
                             Double lat = Double.parseDouble((String) objeto.get("lat"));
                             repository.insertarCoordenadas(input, "NOMINATIN", lat, lon);
                         }
-                        List<ModeloDireccionNominatin> myObjects = objectMapper.readValue(nominatimJsonString, new TypeReference<>() {
-                        });
-                        for(ModeloDireccionNominatin  nom : myObjects){
+                        List<ModeloDireccionNominatin> myObjects = objectMapper.readValue(nominatimJsonString,
+                                new TypeReference<>() {
+                                });
+                        for (ModeloDireccionNominatin nom : myObjects) {
                             nominatimResultado.add(Utils.direccionNominatimToModeloGeneral(nom));
                         }
 
@@ -677,9 +704,15 @@ public class Service {
                     List<ModeloGeneral> photonResultado = new ArrayList<ModeloGeneral>();
                     if (cache != null) {
                         System.out.println("Cache Si");
-                        ModeloDireccionPhoton photonObj = objectMapper.readValue(cache, new TypeReference<>() {
-                        });
-                        photonResultado.add(Utils.direccionPhotonToModeloGeneral(photonObj));
+                        //ModeloDireccionPhoton photonObj = objectMapper.readValue(cache, new TypeReference<>() {});
+                        //photonResultado.add(Utils.direccionPhotonToModeloGeneral(photonObj, 0));
+
+                        ModeloDireccionPhoton myObjects = objectMapper.readValue(cache,new TypeReference<ModeloDireccionPhoton>() {});
+                        photonResultado = new ArrayList<ModeloGeneral>();
+                        for (int i = 0; i < myObjects.getFeatures().length; i++) {
+                            if (myObjects.getFeatures()[i].getProperties().getCountry().equalsIgnoreCase("Uruguay"))
+                                photonResultado.add(Utils.direccionPhotonToModeloGeneral(myObjects, i));
+                        }
                     } else {
                         System.out.println("Cache No");
                         url = "https://photon.komoot.io/api/";
@@ -716,9 +749,13 @@ public class Service {
                         Double longitud = coordenadas.get(0);
                         repository.insertarCoordenadas(input, "PHOTON", latitud, longitud);
 
-                        ModeloDireccionPhoton photonObj = objectMapper.readValue(photonJsonString, new TypeReference<>() {
-                        });
-                        photonResultado.add(Utils.direccionPhotonToModeloGeneral(photonObj));
+                        ModeloDireccionPhoton myObjects = objectMapper.readValue(photonJsonString,new TypeReference<ModeloDireccionPhoton>() {});
+                        photonResultado = new ArrayList<ModeloGeneral>();
+                        for (int i = 0; i < myObjects.getFeatures().length; i++) {
+                            if (myObjects.getFeatures()[i].getProperties().getCountry().equalsIgnoreCase("Uruguay"))
+                                photonResultado.add(Utils.direccionPhotonToModeloGeneral(myObjects, i));
+                        }
+
                     }
 
                     // RESPONSE FINAL
@@ -727,7 +764,10 @@ public class Service {
                     concatenatedList.addAll(ideResultado);
                     concatenatedList.addAll(nominatimResultado);
                     concatenatedList.addAll(photonResultado);
-                    return new ResponseEntity<>(concatenatedList, headers, HttpStatus.OK);
+
+                    // return new ResponseEntity<>(concatenatedList, headers, HttpStatus.OK);
+                    return new ResponseEntity<>(combinarResultado(ideResultado, nominatimResultado, photonResultado),
+                            headers, HttpStatus.OK);
 
                 }
                 default -> {
@@ -761,12 +801,14 @@ public class Service {
                     String cache = tsigCache.obtenerDeCache(datos);
                     if (cache != null) {
                         System.out.println("Cache Si");
-                        List<ModeloDireccionIde> res = objectMapper.readValue(cache, new TypeReference<List<ModeloDireccionIde>>() {}); 
+                        List<ModeloDireccionIde> res = objectMapper.readValue(cache,
+                                new TypeReference<List<ModeloDireccionIde>>() {
+                                });
                         List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
-                        for(ModeloDireccionIde ide : res){
+                        for (ModeloDireccionIde ide : res) {
                             resultado.add(Utils.direccionIdeToModeloGeneral(ide));
                         }
-                        return new ResponseEntity< List<ModeloGeneral>>(resultado, headers,HttpStatus.OK);
+                        return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
                     } else {
                         System.out.println("Cache No");
                     }
@@ -786,9 +828,11 @@ public class Service {
                     input = input + (departamento != "" ? ";departamento:" + departamento : "");
                     // Obtener la respuesta de ResponseEntity
                     jsonString = response.getBody();
-                    
+
                     objectMapper = new ObjectMapper();
-                    List<ModeloDireccionIde> res = objectMapper.readValue(jsonString, new TypeReference<List<ModeloDireccionIde>>() {});    
+                    List<ModeloDireccionIde> res = objectMapper.readValue(jsonString,
+                            new TypeReference<List<ModeloDireccionIde>>() {
+                            });
 
                     // Agrego response para guardar en cache
                     datos.put("response", jsonString);
@@ -797,7 +841,7 @@ public class Service {
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
                     // Analizar la cadena de texto JSON en una lista de objetos Java
-                    
+
                     listaObjetos = objectMapper.readValue(jsonString, new TypeReference<List<Map<String, Object>>>() {
                     });
                     // Recorrer la lista de objetos
@@ -810,9 +854,9 @@ public class Service {
                             repository.insertarCoordenadas(input, "IDE", lat, lon);
                         }
                     }
-                    
+
                     List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
-                    for(ModeloDireccionIde ide : res){
+                    for (ModeloDireccionIde ide : res) {
                         resultado.add(Utils.direccionIdeToModeloGeneral(ide));
                     }
                     return new ResponseEntity<>(resultado, headers, HttpStatus.OK);
@@ -844,12 +888,14 @@ public class Service {
                     String cache = tsigCache.obtenerDeCache(datos);
                     if (cache != null) {
                         System.out.println("Cache Si");
-                        List<ModeloDireccionIde> res = objectMapper.readValue(cache, new TypeReference<List<ModeloDireccionIde>>() {}); 
+                        List<ModeloDireccionIde> res = objectMapper.readValue(cache,
+                                new TypeReference<List<ModeloDireccionIde>>() {
+                                });
                         List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
-                        for(ModeloDireccionIde ide : res){
+                        for (ModeloDireccionIde ide : res) {
                             resultado.add(Utils.direccionIdeToModeloGeneral(ide));
                         }
-                        return new ResponseEntity< List<ModeloGeneral>>(resultado, headers,HttpStatus.OK);
+                        return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
                     } else {
                         System.out.println("Cache No");
                     }
@@ -890,12 +936,14 @@ public class Service {
                             repository.insertarCoordenadas(input, "IDE", lat, lon);
                         }
                     }
-                        List<ModeloDireccionIde> res = objectMapper.readValue(jsonString, new TypeReference<List<ModeloDireccionIde>>() {}); 
-                        List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
-                        for(ModeloDireccionIde ide : res){
-                            resultado.add(Utils.direccionIdeToModeloGeneral(ide));
-                        }
-                        return new ResponseEntity< List<ModeloGeneral>>(resultado, headers,HttpStatus.OK);
+                    List<ModeloDireccionIde> res = objectMapper.readValue(jsonString,
+                            new TypeReference<List<ModeloDireccionIde>>() {
+                            });
+                    List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
+                    for (ModeloDireccionIde ide : res) {
+                        resultado.add(Utils.direccionIdeToModeloGeneral(ide));
+                    }
+                    return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
 
                 }
                 case 3 -> {
@@ -932,12 +980,14 @@ public class Service {
                     String cache = tsigCache.obtenerDeCache(datos);
                     if (cache != null) {
                         System.out.println("Cache Si");
-                        List<ModeloDireccionIde> res = objectMapper.readValue(cache, new TypeReference<List<ModeloDireccionIde>>() {}); 
+                        List<ModeloDireccionIde> res = objectMapper.readValue(cache,
+                                new TypeReference<List<ModeloDireccionIde>>() {
+                                });
                         List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
-                        for(ModeloDireccionIde ide : res){
+                        for (ModeloDireccionIde ide : res) {
                             resultado.add(Utils.direccionIdeToModeloGeneral(ide));
                         }
-                        return new ResponseEntity< List<ModeloGeneral>>(resultado, headers,HttpStatus.OK);
+                        return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
                     } else {
                         System.out.println("Cache No");
                     }
@@ -978,12 +1028,14 @@ public class Service {
                             repository.insertarCoordenadas(input, "IDE", lat, lon);
                         }
                     }
-                        List<ModeloDireccionIde> res = objectMapper.readValue(jsonString, new TypeReference<List<ModeloDireccionIde>>() {}); 
-                        List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
-                        for(ModeloDireccionIde ide : res){
-                            resultado.add(Utils.direccionIdeToModeloGeneral(ide));
-                        }
-                        return new ResponseEntity< List<ModeloGeneral>>(resultado, headers,HttpStatus.OK);
+                    List<ModeloDireccionIde> res = objectMapper.readValue(jsonString,
+                            new TypeReference<List<ModeloDireccionIde>>() {
+                            });
+                    List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
+                    for (ModeloDireccionIde ide : res) {
+                        resultado.add(Utils.direccionIdeToModeloGeneral(ide));
+                    }
+                    return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
                 }
                 case 4 -> {
                     if (nombreInmueble == null) {
@@ -1006,12 +1058,14 @@ public class Service {
                     String cache = tsigCache.obtenerDeCache(datos);
                     if (cache != null) {
                         System.out.println("Cache Si");
-                        List<ModeloDireccionIde> res = objectMapper.readValue(cache, new TypeReference<List<ModeloDireccionIde>>() {});
+                        List<ModeloDireccionIde> res = objectMapper.readValue(cache,
+                                new TypeReference<List<ModeloDireccionIde>>() {
+                                });
                         List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
-                        for(ModeloDireccionIde ide : res){
+                        for (ModeloDireccionIde ide : res) {
                             resultado.add(Utils.direccionIdeToModeloGeneral(ide));
                         }
-                        return new ResponseEntity< List<ModeloGeneral>>(resultado, headers,HttpStatus.OK);
+                        return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
                     } else {
                         System.out.println("Cache No");
                     }
@@ -1049,12 +1103,14 @@ public class Service {
                             repository.insertarCoordenadas(input, "IDE", lat, lon);
                         }
                     }
-                    List<ModeloDireccionIde> res = objectMapper.readValue(jsonString, new TypeReference<List<ModeloDireccionIde>>() {});
+                    List<ModeloDireccionIde> res = objectMapper.readValue(jsonString,
+                            new TypeReference<List<ModeloDireccionIde>>() {
+                            });
                     List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
-                    for(ModeloDireccionIde ide : res){
+                    for (ModeloDireccionIde ide : res) {
                         resultado.add(Utils.direccionIdeToModeloGeneral(ide));
                     }
-                    return new ResponseEntity< List<ModeloGeneral>>(resultado, headers,HttpStatus.OK);
+                    return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
                 }
                 case 5 -> {
                     if (numeroRuta == null) {
@@ -1082,7 +1138,7 @@ public class Service {
                         List<ModeloRutaKmIde> res = objectMapper.readValue(cache, new TypeReference<>() {
                         });
                         List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
-                        for(ModeloRutaKmIde ide : res){
+                        for (ModeloRutaKmIde ide : res) {
                             resultado.add(Utils.rutaKmIdeToModeloGeneral(ide));
                         }
                         return new ResponseEntity<>(resultado, headers, HttpStatus.OK);
@@ -1124,7 +1180,7 @@ public class Service {
                     List<ModeloRutaKmIde> res = objectMapper.readValue(jsonString, new TypeReference<>() {
                     });
                     List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
-                    for(ModeloRutaKmIde ide : res){
+                    for (ModeloRutaKmIde ide : res) {
                         resultado.add(Utils.rutaKmIdeToModeloGeneral(ide));
                     }
                     return new ResponseEntity<>(resultado, headers, HttpStatus.OK);
@@ -1148,12 +1204,14 @@ public class Service {
                     String cache = tsigCache.obtenerDeCache(datos);
                     if (cache != null) {
                         System.out.println("Cache Si");
-                        List<ModeloDireccionIde> res = objectMapper.readValue(cache, new TypeReference<List<ModeloDireccionIde>>() {});
+                        List<ModeloDireccionIde> res = objectMapper.readValue(cache,
+                                new TypeReference<List<ModeloDireccionIde>>() {
+                                });
                         List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
-                        for(ModeloDireccionIde ide : res){
+                        for (ModeloDireccionIde ide : res) {
                             resultado.add(Utils.direccionIdeToModeloGeneral(ide));
                         }
-                        return new ResponseEntity< List<ModeloGeneral>>(resultado, headers,HttpStatus.OK);
+                        return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
                     } else {
                         System.out.println("Cache No");
                     }
@@ -1191,12 +1249,14 @@ public class Service {
                             repository.insertarCoordenadas(input, "IDE", lat, lon);
                         }
                     }
-                    List<ModeloDireccionIde> res = objectMapper.readValue(jsonString, new TypeReference<List<ModeloDireccionIde>>() {});
+                    List<ModeloDireccionIde> res = objectMapper.readValue(jsonString,
+                            new TypeReference<List<ModeloDireccionIde>>() {
+                            });
                     List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
-                    for(ModeloDireccionIde ide : res){
+                    for (ModeloDireccionIde ide : res) {
                         resultado.add(Utils.direccionIdeToModeloGeneral(ide));
                     }
-                    return new ResponseEntity< List<ModeloGeneral>>(resultado, headers,HttpStatus.OK);
+                    return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
                 }
                 default -> {
                     return new ResponseEntity<>("IDFORMACANONICA INVALIDO", headers, HttpStatus.BAD_REQUEST);
@@ -1224,14 +1284,16 @@ public class Service {
                     String cache = tsigCache.obtenerDeCache(datos);
                     if (cache != null) {
                         System.out.println("Cache Si");
-                        List<ModeloDireccionNominatin> myObjects = objectMapper.readValue(cache, new TypeReference<List<ModeloDireccionNominatin>>() {});
+                        List<ModeloDireccionNominatin> myObjects = objectMapper.readValue(cache,
+                                new TypeReference<List<ModeloDireccionNominatin>>() {
+                                });
                         List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
-                        for(ModeloDireccionNominatin  nom : myObjects){
+                        for (ModeloDireccionNominatin nom : myObjects) {
                             resultado.add(Utils.direccionNominatimToModeloGeneral(nom));
                         }
-                        return new ResponseEntity< List<ModeloGeneral>>(resultado, headers,HttpStatus.OK);
+                        return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
 
-                        //return new ResponseEntity<>(cache, headers, HttpStatus.OK);
+                        // return new ResponseEntity<>(cache, headers, HttpStatus.OK);
                     } else {
                         System.out.println("Cache No");
                     }
@@ -1269,14 +1331,16 @@ public class Service {
                         repository.insertarCoordenadas(input, "NOMINATIN", lat, lon);
 
                     }
-                    List<ModeloDireccionNominatin> myObjects = objectMapper.readValue(jsonString, new TypeReference<List<ModeloDireccionNominatin>>() {});
+                    List<ModeloDireccionNominatin> myObjects = objectMapper.readValue(jsonString,
+                            new TypeReference<List<ModeloDireccionNominatin>>() {
+                            });
                     List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
-                    for(ModeloDireccionNominatin  nom : myObjects){
+                    for (ModeloDireccionNominatin nom : myObjects) {
                         resultado.add(Utils.direccionNominatimToModeloGeneral(nom));
                     }
-                    return new ResponseEntity< List<ModeloGeneral>>(resultado, headers,HttpStatus.OK);
+                    return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
 
-                    //return response;
+                    // return response;
                 }
                 case 4 -> {
                     // Construir la URL con los parámetros
@@ -1297,14 +1361,16 @@ public class Service {
                     String cache = tsigCache.obtenerDeCache(datos);
                     if (cache != null) {
                         System.out.println("Cache Si");
-                        List<ModeloDireccionNominatin> myObjects = objectMapper.readValue(cache, new TypeReference<List<ModeloDireccionNominatin>>() {});
+                        List<ModeloDireccionNominatin> myObjects = objectMapper.readValue(cache,
+                                new TypeReference<List<ModeloDireccionNominatin>>() {
+                                });
                         List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
-                        for(ModeloDireccionNominatin  nom : myObjects){
+                        for (ModeloDireccionNominatin nom : myObjects) {
                             resultado.add(Utils.direccionNominatimToModeloGeneral(nom));
                         }
-                        return new ResponseEntity< List<ModeloGeneral>>(resultado, headers,HttpStatus.OK);
+                        return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
 
-                        //return new ResponseEntity<>(cache, headers, HttpStatus.OK);
+                        // return new ResponseEntity<>(cache, headers, HttpStatus.OK);
                     } else {
                         System.out.println("Cache No");
                     }
@@ -1342,12 +1408,14 @@ public class Service {
                         repository.insertarCoordenadas(input, "NOMINATIN", lat, lon);
                     }
 
-                    List<ModeloDireccionNominatin> myObjects = objectMapper.readValue(jsonString, new TypeReference<List<ModeloDireccionNominatin>>() {});
+                    List<ModeloDireccionNominatin> myObjects = objectMapper.readValue(jsonString,
+                            new TypeReference<List<ModeloDireccionNominatin>>() {
+                            });
                     List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
-                    for(ModeloDireccionNominatin  nom : myObjects){
+                    for (ModeloDireccionNominatin nom : myObjects) {
                         resultado.add(Utils.direccionNominatimToModeloGeneral(nom));
                     }
-                    return new ResponseEntity< List<ModeloGeneral>>(resultado, headers,HttpStatus.OK);
+                    return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
 
                 }
                 default -> {
@@ -1376,9 +1444,16 @@ public class Service {
                     String cache = tsigCache.obtenerDeCache(datos);
                     if (cache != null) {
                         System.out.println("Cache Si");
-                        ModeloDireccionPhoton myObjects = objectMapper.readValue(cache, new TypeReference<ModeloDireccionPhoton>() {});
-                        return new ResponseEntity< ModeloGeneral>( Utils.direccionPhotonToModeloGeneral(myObjects), headers,HttpStatus.OK);
-                        //return new ResponseEntity<>(cache, headers, HttpStatus.OK);
+                        ModeloDireccionPhoton myObjects = objectMapper.readValue(cache,
+                                new TypeReference<ModeloDireccionPhoton>() {
+                                });
+
+                        List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
+                        for (int i = 0; i < myObjects.getFeatures().length; i++) {
+                            if (myObjects.getFeatures()[i].getProperties().getCountry().equalsIgnoreCase("Uruguay"))
+                                resultado.add(Utils.direccionPhotonToModeloGeneral(myObjects, i));
+                        }
+                        return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
                     } else {
                         System.out.println("Cache No");
                     }
@@ -1418,9 +1493,19 @@ public class Service {
                     Double longitud = coordenadas.get(0);
                     repository.insertarCoordenadas(input, "PHOTON", latitud, longitud);
 
-                    ModeloDireccionPhoton myObjects = objectMapper.readValue(jsonString, new TypeReference<ModeloDireccionPhoton>() {});
-                    return new ResponseEntity< ModeloGeneral>( Utils.direccionPhotonToModeloGeneral(myObjects), headers,HttpStatus.OK);
-                    //return response;
+                    ModeloDireccionPhoton myObjects = objectMapper.readValue(jsonString,
+                            new TypeReference<ModeloDireccionPhoton>() {
+                            });
+
+                    List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
+                    for (int i = 0; i < myObjects.getFeatures().length; i++) {
+                        if (myObjects.getFeatures()[i].getProperties().getCountry().equalsIgnoreCase("Uruguay"))
+                            resultado.add(Utils.direccionPhotonToModeloGeneral(myObjects, i));
+                    }
+                    return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
+                    // return new ResponseEntity<ModeloGeneral>(
+                    // Utils.direccionPhotonToModeloGeneral(myObjects), headers,HttpStatus.OK);
+                    // return response;
                 }
                 return new ResponseEntity<>(
                         "El idFormaCanonica " + idFormaCanonica + " no es valido para el geocoder seleccionado.",
@@ -1570,5 +1655,140 @@ public class Service {
         String jsonString = response.getBody();
 
         return response;
+    }
+
+    private List<DireccionCombinada> combinarResultado(List<ModeloGeneral> listaIde, List<ModeloGeneral> listaNominatim,
+            List<ModeloGeneral> listaPhoton) {
+        List<DireccionCombinada> direccionesCombinadas = new ArrayList<>();
+
+        if (listaIde != null && listaIde.size() > 0) {
+            for (ModeloGeneral modeloGeneral : listaIde) {
+                DireccionCombinada direccionCombinada = new DireccionCombinada();
+                direccionCombinada.setGeoCoders(new String[] {});
+
+                String nombreNormalizado = Utils.RemplazarTildesYEspacios(modeloGeneral.getNombreNormalizado())
+                        .replace("+", " ").toUpperCase();
+                direccionCombinada.setNombreNormalizado(nombreNormalizado);
+                direccionCombinada.setDepartamento(modeloGeneral.getDepartamento());
+                // Agregi geocoder a lista de geocoders
+                List<String> listaNombres = new ArrayList<String>(Arrays.asList(direccionCombinada.getGeoCoders()));
+                listaNombres.add("IDE");
+                direccionCombinada.setGeoCoders(listaNombres.toArray(new String[0]));
+
+                DireccionGeoCodificador ide = new DireccionGeoCodificador();
+                ide.setLatitud(modeloGeneral.getLatitud());
+                ide.setLongitud(modeloGeneral.getLongitud());
+                ide.setCodPostal(
+                        modeloGeneral.getCodigoPostal() != null ? modeloGeneral.getCodigoPostal().toString() : "");
+                ide.setLocalidad(modeloGeneral.getLocalidad());
+                ide.setNombreNormalizado(modeloGeneral.getNombreNormalizado());
+                direccionCombinada.setIDE(ide);
+                direccionesCombinadas.add(direccionCombinada);
+            }
+        }
+
+        if (listaPhoton != null && listaPhoton.size() > 0) {
+            for (ModeloGeneral modeloGeneral : listaPhoton) {
+                boolean existe = false;
+                // Recorro lista de direcciones existentes
+                for (DireccionCombinada direccionesCombinada : direccionesCombinadas) {
+                    // Si es misma direccion y mismo departamento
+                    if (Utils.isEqualsDirModeloGeneral(modeloGeneral, direccionesCombinada)) {
+                        // Agregi geocoder a lista de geocoders
+                        List<String> listaNombres = new ArrayList<String>(
+                                Arrays.asList(direccionesCombinada.getGeoCoders()));
+                        listaNombres.add("PHOTON");
+                        direccionesCombinada.setGeoCoders(listaNombres.toArray(new String[0]));
+
+                        DireccionGeoCodificador photon = new DireccionGeoCodificador();
+                        photon.setLatitud(modeloGeneral.getLatitud());
+                        photon.setLongitud(modeloGeneral.getLongitud());
+                        photon.setCodPostal(
+                                modeloGeneral.getCodigoPostal() != null ? modeloGeneral.getCodigoPostal().toString()
+                                        : "");
+                        photon.setLocalidad(modeloGeneral.getLocalidad());
+                        photon.setNombreNormalizado(modeloGeneral.getNombreNormalizado());
+                        direccionesCombinada.setPhoton(photon);
+                        existe = true;
+                        break;
+                    }
+                }
+                // Si no hay coincidencia agregi nueva direccion
+                if (!existe) {
+                    DireccionCombinada direccionCombinada = new DireccionCombinada();
+                    direccionCombinada.setGeoCoders(new String[] {});
+
+                    direccionCombinada.setNombreNormalizado(modeloGeneral.getNombreNormalizado());
+                    direccionCombinada.setDepartamento(modeloGeneral.getDepartamento());
+                    // Agrego geocoder a lista de geocoders
+                    List<String> listaNombres = new ArrayList<String>(Arrays.asList(direccionCombinada.getGeoCoders()));
+                    listaNombres.add("Photon");
+                    direccionCombinada.setGeoCoders(listaNombres.toArray(new String[0]));
+
+                    DireccionGeoCodificador photon = new DireccionGeoCodificador();
+                    photon.setLatitud(modeloGeneral.getLatitud());
+                    photon.setLongitud(modeloGeneral.getLongitud());
+                    photon.setCodPostal(
+                            modeloGeneral.getCodigoPostal() != null ? modeloGeneral.getCodigoPostal().toString() : "");
+                    photon.setLocalidad(modeloGeneral.getLocalidad());
+                    photon.setNombreNormalizado(modeloGeneral.getNombreNormalizado());
+                    direccionCombinada.setPhoton(photon);
+                    direccionesCombinadas.add(direccionCombinada);
+                }
+            }
+        }
+
+        if (listaNominatim != null && listaNominatim.size() > 0) {
+            for (ModeloGeneral modeloGeneral : listaNominatim) {
+                boolean existe = false;
+                // Recorro lista de direcciones existentes
+                for (DireccionCombinada direccionesCombinada : direccionesCombinadas) {
+                    // Si es misma direccion y mismo departamento
+                    if (Utils.isEqualsDirModeloGeneral(modeloGeneral, direccionesCombinada)) {
+                        // Agregi geocoder a lista de geocoders
+                        List<String> listaNombres = new ArrayList<String>(
+                                Arrays.asList(direccionesCombinada.getGeoCoders()));
+                        listaNombres.add("NOMINATIM");
+                        direccionesCombinada.setGeoCoders(listaNombres.toArray(new String[0]));
+
+                        DireccionGeoCodificador nominatim = new DireccionGeoCodificador();
+                        nominatim.setLatitud(modeloGeneral.getLatitud());
+                        nominatim.setLongitud(modeloGeneral.getLongitud());
+                        nominatim.setCodPostal(
+                                modeloGeneral.getCodigoPostal() != null ? modeloGeneral.getCodigoPostal().toString()
+                                        : "");
+                        nominatim.setLocalidad(modeloGeneral.getLocalidad());
+                        nominatim.setNombreNormalizado(modeloGeneral.getNombreNormalizado());
+                        direccionesCombinada.setNominatim(nominatim);
+                        existe = true;
+                        break;
+                    }
+                }
+                // Si no hay coincidencia agregi nueva direccion
+                if (!existe) {
+                    DireccionCombinada direccionCombinada = new DireccionCombinada();
+                    direccionCombinada.setGeoCoders(new String[] {});
+
+                    direccionCombinada.setNombreNormalizado(modeloGeneral.getNombreNormalizado());
+                    direccionCombinada.setDepartamento(modeloGeneral.getDepartamento());
+                    // Agrego geocoder a lista de geocoders
+                    List<String> listaNombres = new ArrayList<String>(Arrays.asList(direccionCombinada.getGeoCoders()));
+                    listaNombres.add("NOMINATIM");
+                    direccionCombinada.setGeoCoders(listaNombres.toArray(new String[0]));
+
+                    DireccionGeoCodificador nominatim = new DireccionGeoCodificador();
+                    nominatim.setLatitud(modeloGeneral.getLatitud());
+                    nominatim.setLongitud(modeloGeneral.getLongitud());
+                    nominatim.setCodPostal(
+                            modeloGeneral.getCodigoPostal() != null ? modeloGeneral.getCodigoPostal().toString() : "");
+                    nominatim.setLocalidad(modeloGeneral.getLocalidad());
+                    nominatim.setNombreNormalizado(modeloGeneral.getNombreNormalizado());
+                    direccionCombinada.setNominatim(nominatim);
+                    direccionesCombinadas.add(direccionCombinada);
+                }
+            }
+        }
+
+        return direccionesCombinadas;
     }
 }
