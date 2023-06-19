@@ -1,5 +1,6 @@
 package com.example.tsig;
 
+import com.example.tsig.services.BackofficeService;
 import com.example.tsig.services.Service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -34,6 +35,9 @@ class DireccionesController {
 
 	@Autowired
 	Service service;
+
+	@Autowired
+	BackofficeService backofficeService;
 
 	@GetMapping("/formasCanonicas")
 	@CrossOrigin(origins = "*") // Permitir todas las IPs
@@ -109,5 +113,12 @@ class DireccionesController {
 			@RequestParam(value = "longitud") Double longitud,
 			@RequestParam(value = "limit", required = false) Integer limit) throws JsonProcessingException {
 		return service.reverse(latitud, longitud, limit);
+	}
+
+	/////////////////// BACKOFFICE ////////////////////
+	@GetMapping("/backoffice/distancias")
+	public ResponseEntity<String> distancias() throws JsonProcessingException {
+		backofficeService.HaversineDistanceCalculator();
+		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 }
