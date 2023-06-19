@@ -1,5 +1,6 @@
 package com.example.tsig.repositories;
 
+import com.example.tsig.models.im.DireccionIM;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -132,6 +133,32 @@ public class Repository {
             return (String) rows.get(0).get("response");
         } else {
             return null;
+        }
+    }
+
+    public Map<Integer, DireccionIM> obtenerDireccionesIM() {
+        Map<Integer, DireccionIM> direccionesIM = new HashMap<>();
+        String sql = "SELECT * FROM DIRECCIONES_IM";
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
+
+        // Procesar los resultados
+        for (Map<String, Object> row : rows) {
+            DireccionIM direccionIM = new DireccionIM();
+            direccionIM.setId((Integer) row.get("id"));
+            direccionIM.setCalle((String) row.get("calle"));
+            direccionIM.setNumero((Integer) row.get("numero"));
+            direccionIM.setLatitud((Double) row.get("latitud"));
+            direccionIM.setLongitud((Double) row.get("longitud"));
+            direccionesIM.put((Integer) row.get("id"), direccionIM);
+        }
+        return direccionesIM;
+    }
+
+    public void insertarDistancia(Integer idElemento, Integer idGeocoder, Double lat, Double lon, Float distancia) {
+        String sql = "INSERT INTO distancias_im_geocoders (id_direcciones_im,id_geocoder,latitud_geocoder,longitud_geocoder, distancia_metros) VALUES (?,?,?,?,?)";
+        int rows = jdbcTemplate.update(sql, idElemento, idGeocoder, lat, lon, distancia);
+        if (rows > 0) {
+            System.out.println("A new row has been inserted.");
         }
     }
 }
