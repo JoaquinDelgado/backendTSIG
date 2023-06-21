@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import com.example.tsig.models.general.ModeloGeneral;
 import com.example.tsig.models.ide.ModeloDireccionIde;
 import com.example.tsig.models.ide.ModeloRutaKmIde;
+import com.example.tsig.models.ide.ReverseIde;
 import com.example.tsig.models.nominatim.ModeloDireccionNominatin;
 import com.example.tsig.models.photon.ModeloDireccionPhoton;
 import com.example.tsig.models.resultadocombinado.DireccionCombinada;
@@ -174,6 +175,16 @@ public class Utils {
 
         return distance0;
 
+    }
+
+    public static ModeloGeneral reverseIdeToModeloGeneral(ReverseIde reverseIde) {
+        return new ModeloGeneral("IDE",
+                reverseIde.getAddress(),
+                reverseIde.getDepartamento(),
+                reverseIde.getLocalidad(),
+                Integer.parseInt(reverseIde.getPostalCode()),
+                reverseIde.getLat(),
+                reverseIde.getLng());
     }
 
 }

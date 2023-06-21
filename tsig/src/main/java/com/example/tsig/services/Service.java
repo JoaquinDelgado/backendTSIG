@@ -4,6 +4,7 @@ import com.example.tsig.cache.TsigCache;
 import com.example.tsig.models.general.ModeloGeneral;
 import com.example.tsig.models.ide.ModeloDireccionIde;
 import com.example.tsig.models.ide.ModeloRutaKmIde;
+import com.example.tsig.models.ide.ReverseIde;
 import com.example.tsig.models.nominatim.ModeloDireccionNominatin;
 import com.example.tsig.models.photon.ModeloDireccionPhoton;
 import com.example.tsig.models.resultadocombinado.DireccionCombinada;
@@ -12,6 +13,7 @@ import com.example.tsig.repositories.Repository;
 import com.example.tsig.utils.Utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -1250,13 +1252,13 @@ public class Service {
                         }
                     }
                     List<ModeloDireccionIde> res = objectMapper.readValue(jsonString,
-                            new TypeReference<List<ModeloDireccionIde>>() {
+                            new TypeReference<>() {
                             });
-                    List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
+                    List<ModeloGeneral> resultado = new ArrayList<>();
                     for (ModeloDireccionIde ide : res) {
                         resultado.add(Utils.direccionIdeToModeloGeneral(ide));
                     }
-                    return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
+                    return new ResponseEntity<>(resultado, headers, HttpStatus.OK);
                 }
                 default -> {
                     return new ResponseEntity<>("IDFORMACANONICA INVALIDO", headers, HttpStatus.BAD_REQUEST);
@@ -1625,7 +1627,7 @@ public class Service {
         return response;
     }
 
-    public ResponseEntity<String> reverse(Double latitud, Double longitud, Integer limit) {
+    public ResponseEntity<?> reverse(Double latitud, Double longitud, Integer limit) throws JsonProcessingException {
         RestTemplate restTemplate = new RestTemplate();
 
         // Configurar los encabezados de la solicitud
@@ -1654,7 +1656,15 @@ public class Service {
 
         String jsonString = response.getBody();
 
-        return response;
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<ReverseIde> res = objectMapper.readValue(jsonString,
+                new TypeReference<>() {
+                });
+        List<ModeloGeneral> resultado = new ArrayList<>();
+        for (ReverseIde reverse : res) {
+            resultado.add(Utils.reverseIdeToModeloGeneral(reverse));
+        }
+        return new ResponseEntity<>(resultado, headers, HttpStatus.OK);
     }
 
     private List<DireccionCombinada> combinarResultado(List<ModeloGeneral> listaIde, List<ModeloGeneral> listaNominatim,

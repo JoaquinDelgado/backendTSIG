@@ -108,7 +108,7 @@ class DireccionesController {
 
 	@GetMapping("/reverse")
 	@CrossOrigin(origins = "*") // Permitir todas las IPs
-	public ResponseEntity<String> reverse(
+	public ResponseEntity<?> reverse(
 			@RequestParam(value = "latitud") Double latitud,
 			@RequestParam(value = "longitud") Double longitud,
 			@RequestParam(value = "limit", required = false) Integer limit) throws JsonProcessingException {
