@@ -1334,15 +1334,13 @@ public class Service {
 
                     }
                     List<ModeloDireccionNominatin> myObjects = objectMapper.readValue(jsonString,
-                            new TypeReference<List<ModeloDireccionNominatin>>() {
+                            new TypeReference<>() {
                             });
-                    List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
+                    List<ModeloGeneral> resultado = new ArrayList<>();
                     for (ModeloDireccionNominatin nom : myObjects) {
                         resultado.add(Utils.direccionNominatimToModeloGeneral(nom));
                     }
-                    return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
-
-                    // return response;
+                    return new ResponseEntity<>(resultado, headers, HttpStatus.OK);
                 }
                 case 4 -> {
                     // Construir la URL con los parámetros
@@ -1586,7 +1584,7 @@ public class Service {
         return ResponseEntity.ok(response);
     }
 
-    public ResponseEntity<String> busquedaSimple(String entrada) throws JsonProcessingException {
+    public ResponseEntity<?> busquedaSimple(String entrada) throws JsonProcessingException {
         RestTemplate restTemplate = new RestTemplate();
 
         // Configurar los encabezados de la solicitud
@@ -1624,7 +1622,14 @@ public class Service {
             Double lat = Double.parseDouble((String) objeto.get("lat"));
             repository.insertarCoordenadas(input, "NOMINATIM", lat, lon);
         }
-        return response;
+        List<ModeloDireccionNominatin> myObjects = objectMapper.readValue(jsonString,
+                new TypeReference<>() {
+                });
+        List<ModeloGeneral> resultado = new ArrayList<>();
+        for (ModeloDireccionNominatin nom : myObjects) {
+            resultado.add(Utils.direccionNominatimToModeloGeneral(nom));
+        }
+        return new ResponseEntity<>(resultado, headers, HttpStatus.OK);
     }
 
     public ResponseEntity<?> reverse(Double latitud, Double longitud, Integer limit) throws JsonProcessingException {

@@ -101,7 +101,7 @@ class DireccionesController {
 
 	@GetMapping("/busquedaSimple")
 	@CrossOrigin(origins = "*") // Permitir todas las IPs
-	public ResponseEntity<String> busquedaSimple(
+	public ResponseEntity<?> busquedaSimple(
 			@RequestParam(value = "entrada") String entrada) throws JsonProcessingException {
 		return service.busquedaSimple(entrada);
 	}
