@@ -26,6 +26,9 @@ import org.springframework.web.util.UriBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
+import java.net.URI;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -1555,33 +1558,42 @@ public class Service {
         return response;
     }
 
-    public ResponseEntity<String> direcEnPoligono(Integer limit, String poligono, String tipoDirec) {
+    public ResponseEntity<?> direcEnPoligono(Integer limit, String poligono, String tipoDirec) throws JsonProcessingException {
         WebClient webClient = WebClient.builder()
                 .baseUrl("https://direcciones.ide.uy/api/v1/geocode")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "*")
                 .build();
 
-        UriBuilder uriBuilder = UriComponentsBuilder.fromPath("/direcEnPoligono")
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString("https://direcciones.ide.uy/api/v1/geocode/direcEnPoligono")
                 .queryParam("poligono", poligono);
 
         if (limit != null) {
             uriBuilder.queryParam("limit", limit);
         }
-        if (tipoDirec != null) {
+        if (tipoDirec != null && !tipoDirec.isEmpty()) {
             uriBuilder.queryParam("tipoDirec", tipoDirec);
         }
 
-        String uri = uriBuilder.build().toString();
+        URI uri = uriBuilder.build().encode().toUri();
 
         Mono<String> responseMono = webClient.get()
                 .uri(uri)
+                .accept(MediaType.APPLICATION_JSON) // Especificar que esperas una respuesta en formato JSON
                 .retrieve()
                 .bodyToMono(String.class);
 
         String response = responseMono.block(); // Bloquea y espera la respuesta
 
-        return ResponseEntity.ok(response);
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<ReverseIde> myObjects = objectMapper.readValue(response,
+                new TypeReference<>() {
+                });
+        List<ModeloGeneral> resultado = new ArrayList<>();
+        for (ReverseIde nom : myObjects) {
+            resultado.add(Utils.reverseIdeToModeloGeneral(nom));
+        }
+        return new ResponseEntity<>(resultado, HttpStatus.OK);
     }
 
     public ResponseEntity<?> busquedaSimple(String entrada) throws JsonProcessingException {

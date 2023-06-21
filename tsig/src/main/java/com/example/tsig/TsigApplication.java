@@ -93,9 +93,9 @@ class DireccionesController {
 
 	@GetMapping("/direcEnPoligono")
 	@CrossOrigin(origins = "*")
-	public ResponseEntity<String> direcEnPoligono(@RequestParam(value = "limit", required = false) Integer limit,
+	public ResponseEntity<?> direcEnPoligono(@RequestParam(value = "limit", required = false) Integer limit,
 												  @RequestParam(value = "poligono") String poligono,
-												  @RequestParam(value = "tipoDirec", required = false) String tipoDirec) {
+												  @RequestParam(value = "tipoDirec", required = false) String tipoDirec) throws JsonProcessingException {
 	  return service.direcEnPoligono(limit, poligono, tipoDirec);
 	}
 
