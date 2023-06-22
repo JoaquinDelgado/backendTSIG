@@ -179,13 +179,6 @@ public class Utils {
     }
 
     public static DireccionCombinada reverseIdeToModeloGeneral(ReverseIde reverseIde) {
-        /*return new ModeloGeneral("IDE",
-                reverseIde.getAddress(),
-                reverseIde.getDepartamento(),
-                reverseIde.getLocalidad(),
-                Integer.parseInt(reverseIde.getPostalCode()),
-                reverseIde.getLat(),
-                reverseIde.getLng());*/
 
         DireccionGeoCodificador dirIde = new DireccionGeoCodificador();
         dirIde.setCodPostal(reverseIde.getPostalCode());
@@ -197,7 +190,7 @@ public class Utils {
         DireccionCombinada res =  new DireccionCombinada();
         res.setNombreNormalizado(reverseIde.getAddress());
         res.setDepartamento(reverseIde.getDepartamento());
-        res.setGeoCoders(new String[]{"IDE"});
+        res.setGeoCoders(new String[]{"ide"});
         res.setIDE(dirIde);
         res.setNominatim(null);
         res.setPhoton(null);
