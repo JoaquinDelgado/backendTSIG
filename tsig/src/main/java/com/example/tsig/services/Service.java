@@ -1562,7 +1562,6 @@ public class Service {
         WebClient webClient = WebClient.builder()
                 .baseUrl("https://direcciones.ide.uy/api/v1/geocode")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .defaultHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "*")
                 .build();
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString("https://direcciones.ide.uy/api/v1/geocode/direcEnPoligono")
@@ -1589,7 +1588,7 @@ public class Service {
         List<ReverseIde> myObjects = objectMapper.readValue(response,
                 new TypeReference<>() {
                 });
-        List<ModeloGeneral> resultado = new ArrayList<>();
+        List<DireccionCombinada> resultado = new ArrayList<>();
         for (ReverseIde nom : myObjects) {
             resultado.add(Utils.reverseIdeToModeloGeneral(nom));
         }
