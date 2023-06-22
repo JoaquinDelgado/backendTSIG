@@ -1677,7 +1677,7 @@ public class Service {
         List<ReverseIde> res = objectMapper.readValue(jsonString,
                 new TypeReference<>() {
                 });
-        List<ModeloGeneral> resultado = new ArrayList<>();
+        List<DireccionCombinada> resultado = new ArrayList<>();
         for (ReverseIde reverse : res) {
             resultado.add(Utils.reverseIdeToModeloGeneral(reverse));
         }

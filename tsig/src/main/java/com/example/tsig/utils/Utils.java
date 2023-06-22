@@ -10,6 +10,7 @@ import com.example.tsig.models.ide.ReverseIde;
 import com.example.tsig.models.nominatim.ModeloDireccionNominatin;
 import com.example.tsig.models.photon.ModeloDireccionPhoton;
 import com.example.tsig.models.resultadocombinado.DireccionCombinada;
+import com.example.tsig.models.resultadocombinado.DireccionGeoCodificador;
 
 public class Utils {
 
@@ -177,14 +178,31 @@ public class Utils {
 
     }
 
-    public static ModeloGeneral reverseIdeToModeloGeneral(ReverseIde reverseIde) {
-        return new ModeloGeneral("IDE",
+    public static DireccionCombinada reverseIdeToModeloGeneral(ReverseIde reverseIde) {
+        /*return new ModeloGeneral("IDE",
                 reverseIde.getAddress(),
                 reverseIde.getDepartamento(),
                 reverseIde.getLocalidad(),
                 Integer.parseInt(reverseIde.getPostalCode()),
                 reverseIde.getLat(),
-                reverseIde.getLng());
+                reverseIde.getLng());*/
+
+        DireccionGeoCodificador dirIde = new DireccionGeoCodificador();
+        dirIde.setCodPostal(reverseIde.getPostalCode());
+        dirIde.setLatitud(reverseIde.getLat());
+        dirIde.setLongitud(reverseIde.getLng());
+        dirIde.setNombreNormalizado(reverseIde.getAddress());
+        dirIde.setLocalidad(reverseIde.getLocalidad());
+
+        DireccionCombinada res =  new DireccionCombinada();
+        res.setNombreNormalizado(reverseIde.getAddress());
+        res.setDepartamento(reverseIde.getDepartamento());
+        res.setGeoCoders(new String[]{"IDE"});
+        res.setIDE(dirIde);
+        res.setNominatim(null);
+        res.setPhoton(null);
+
+        return res;
     }
 
 }
