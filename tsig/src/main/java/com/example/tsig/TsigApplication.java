@@ -96,6 +96,7 @@ class DireccionesController {
 	public ResponseEntity<?> direcEnPoligono(@RequestParam(value = "limit", required = false) Integer limit,
 												  @RequestParam(value = "poligono") String poligono,
 												  @RequestParam(value = "tipoDirec", required = false) String tipoDirec) throws JsonProcessingException {
+		String poligonoTemporal = "%7B%22type%22%3A%22Polygon%22%2C%22coordinates%22%3A%5B%5B%5B-56.1720%2C%20-34.8716%5D%2C%5B-56.1690%2C%20-34.8754%5D%2C%5B-56.1757%2C%20-34.8773%5D%2C%5B-56.1720%2C%20-34.8716%5D%5D%5D%7D"
 	  return service.direcEnPoligono(limit, poligono, tipoDirec);
 	}
 
