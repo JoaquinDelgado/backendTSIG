@@ -576,7 +576,7 @@ public class Service {
                     if (cache != null) {
                         System.out.println("Cache Si");
                         List<ModeloDireccionIde> res = objectMapper.readValue(cache,
-                                new TypeReference<List<ModeloDireccionIde>>() {
+                                new TypeReference<>() {
                                 });
                         for (ModeloDireccionIde ide : res) {
                             ideResultado.add(Utils.direccionIdeToModeloGeneral(ide));
@@ -769,8 +769,6 @@ public class Service {
                     concatenatedList.addAll(ideResultado);
                     concatenatedList.addAll(nominatimResultado);
                     concatenatedList.addAll(photonResultado);
-
-                    // return new ResponseEntity<>(concatenatedList, headers, HttpStatus.OK);
                     return new ResponseEntity<>(combinarResultado(ideResultado, nominatimResultado, photonResultado),
                             headers, HttpStatus.OK);
 
