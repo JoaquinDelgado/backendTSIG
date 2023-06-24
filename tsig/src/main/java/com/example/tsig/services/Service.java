@@ -1,6 +1,5 @@
 package com.example.tsig.services;
 
-import com.example.tsig.cache.TsigCache;
 import com.example.tsig.models.general.ModeloGeneral;
 import com.example.tsig.models.general.Punto;
 import com.example.tsig.models.ide.ModeloDireccionIde;
@@ -15,7 +14,6 @@ import com.example.tsig.utils.Constante;
 import com.example.tsig.utils.Utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -24,13 +22,10 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.util.UriBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -44,8 +39,7 @@ public class Service {
     @Autowired
     Repository repository;
 
-    @Autowired
-    TsigCache tsigCache;
+
 
     public Map<Integer, String> formasCanonicas() {
         return repository.obtenerFormasCanonicas();
@@ -103,7 +97,7 @@ public class Service {
                     datos.put("departamento", departamento);
 
                     // Busco en cache
-                    String cache = tsigCache.obtenerDeCache(datos);
+                    String cache = repository.obtenerBusquedaDeCache(datos);
                     if (cache != null) {
                         System.out.println("Cache Si");
                         List<ModeloDireccionIde> res = objectMapper.readValue(cache,
@@ -133,7 +127,7 @@ public class Service {
 
                     // Agrego response para guardar en cache
                     datos.put("response", jsonString);
-                    tsigCache.insertarEnCache(datos);
+                    repository.insertarBusquedaEnCache(datos);
 
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
@@ -183,7 +177,7 @@ public class Service {
                     datos.put("departamento", departamento);
 
                     // Busco en cache
-                    String cache = tsigCache.obtenerDeCache(datos);
+                    String cache = repository.obtenerBusquedaDeCache(datos);
                     if (cache != null) {
                         System.out.println("Cache Si");
                         List<ModeloDireccionIde> res = objectMapper.readValue(cache,
@@ -218,7 +212,7 @@ public class Service {
 
                     // Agrego response para guardar en cache
                     datos.put("response", jsonString);
-                    tsigCache.insertarEnCache(datos);
+                    repository.insertarBusquedaEnCache(datos);
 
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
@@ -275,7 +269,7 @@ public class Service {
                     datos.put("departamento", departamento);
 
                     // Busco en cache
-                    String cache = tsigCache.obtenerDeCache(datos);
+                    String cache = repository.obtenerBusquedaDeCache(datos);
                     if (cache != null) {
                         System.out.println("Cache Si");
                         List<ModeloDireccionIde> res = objectMapper.readValue(cache,
@@ -309,7 +303,7 @@ public class Service {
 
                     // Agrego response para guardar en cache
                     datos.put("response", jsonString);
-                    tsigCache.insertarEnCache(datos);
+                    repository.insertarBusquedaEnCache(datos);
 
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
@@ -353,7 +347,7 @@ public class Service {
                     datos.put("departamento", departamento);
 
                     // Busco en cache
-                    String cache = tsigCache.obtenerDeCache(datos);
+                    String cache = repository.obtenerBusquedaDeCache(datos);
                     List<ModeloGeneral> ideResultado = new ArrayList<>();
                     if (cache != null) {
                         System.out.println("Cache Si");
@@ -381,7 +375,7 @@ public class Service {
 
                         // Agrego response para guardar en cache
                         datos.put("response", jsonString);
-                        tsigCache.insertarEnCache(datos);
+                        repository.insertarBusquedaEnCache(datos);
 
                         // Crear un ObjectMapper de Jackson
                         objectMapper = new ObjectMapper();
@@ -422,7 +416,7 @@ public class Service {
                     datos.put("departamento", departamento);
 
                     // Busco en cache
-                    cache = tsigCache.obtenerDeCache(datos);
+                    cache = repository.obtenerBusquedaDeCache(datos);
                     List<ModeloGeneral> nominatimResultado = new ArrayList<ModeloGeneral>();
                     if (cache != null) {
                         System.out.println("Cache Si");
@@ -454,7 +448,7 @@ public class Service {
 
                         // Agrego response para guardar en cache
                         datos.put("response", nominatimJsonString);
-                        tsigCache.insertarEnCache(datos);
+                        repository.insertarBusquedaEnCache(datos);
 
                         // Crear un ObjectMapper de Jackson
                         objectMapper = new ObjectMapper();
@@ -503,7 +497,7 @@ public class Service {
                     datos.put("kilometro", kilometro.toString());
 
                     // Busco en cache
-                    String cache = tsigCache.obtenerDeCache(datos);
+                    String cache = repository.obtenerBusquedaDeCache(datos);
                     if (cache != null) {
                         System.out.println("Cache Si");
                         List<ModeloRutaKmIde> res = objectMapper.readValue(cache, new TypeReference<>() {
@@ -534,7 +528,7 @@ public class Service {
 
                     // Agrego response para guardar en cache
                     datos.put("response", jsonString);
-                    tsigCache.insertarEnCache(datos);
+                    repository.insertarBusquedaEnCache(datos);
 
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
@@ -573,7 +567,7 @@ public class Service {
                     datos.put("numero", numero);
 
                     // Busco en cache
-                    String cache = tsigCache.obtenerDeCache(datos);
+                    String cache = repository.obtenerBusquedaDeCache(datos);
                     List<ModeloGeneral> ideResultado = new ArrayList<>();
                     if (cache != null) {
                         System.out.println("Cache Si");
@@ -602,7 +596,7 @@ public class Service {
 
                         // Datos para guardar en cache
                         datos.put("response", jsonString);
-                        tsigCache.insertarEnCache(datos);
+                        repository.insertarBusquedaEnCache(datos);
 
                         // Crear un ObjectMapper de Jackson
                         objectMapper = new ObjectMapper();
@@ -642,7 +636,7 @@ public class Service {
                     datos.put("numero", numero);
 
                     // Busco en cache
-                    cache = tsigCache.obtenerDeCache(datos);
+                    cache = repository.obtenerBusquedaDeCache(datos);
                     List<ModeloGeneral> nominatimResultado = new ArrayList<ModeloGeneral>();
                     if (cache != null) {
                         System.out.println("Cache Si");
@@ -671,7 +665,7 @@ public class Service {
 
                         // Datos para guardar en cache
                         datos.put("response", nominatimJsonString);
-                        tsigCache.insertarEnCache(datos);
+                        repository.insertarBusquedaEnCache(datos);
 
                         // Crear un ObjectMapper de Jackson
                         objectMapper = new ObjectMapper();
@@ -707,7 +701,7 @@ public class Service {
                     datos.put("numero", numero);
 
                     // Busco en cache
-                    cache = tsigCache.obtenerDeCache(datos);
+                    cache = repository.obtenerBusquedaDeCache(datos);
                     List<ModeloGeneral> photonResultado = new ArrayList<ModeloGeneral>();
                     if (cache != null) {
                         System.out.println("Cache Si");
@@ -739,7 +733,7 @@ public class Service {
 
                         // Datos para guardar en cache
                         datos.put("response", photonJsonString);
-                        tsigCache.insertarEnCache(datos);
+                        repository.insertarBusquedaEnCache(datos);
 
                         // Crear un ObjectMapper de Jackson
                         objectMapper = new ObjectMapper();
@@ -805,7 +799,7 @@ public class Service {
                     datos.put("departamento", departamento);
 
                     // Busco en cache
-                    String cache = tsigCache.obtenerDeCache(datos);
+                    String cache = repository.obtenerBusquedaDeCache(datos);
                     if (cache != null) {
                         System.out.println("Cache Si");
                         List<ModeloDireccionIde> res = objectMapper.readValue(cache,
@@ -843,7 +837,7 @@ public class Service {
 
                     // Agrego response para guardar en cache
                     datos.put("response", jsonString);
-                    tsigCache.insertarEnCache(datos);
+                    repository.insertarBusquedaEnCache(datos);
 
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
@@ -892,7 +886,7 @@ public class Service {
                     datos.put("departamento", departamento);
 
                     // Busco en cache
-                    String cache = tsigCache.obtenerDeCache(datos);
+                    String cache = repository.obtenerBusquedaDeCache(datos);
                     if (cache != null) {
                         System.out.println("Cache Si");
                         List<ModeloDireccionIde> res = objectMapper.readValue(cache,
@@ -926,7 +920,7 @@ public class Service {
 
                     // Agrego response para guardar en cache
                     datos.put("response", jsonString);
-                    tsigCache.insertarEnCache(datos);
+                    repository.insertarBusquedaEnCache(datos);
 
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
@@ -984,7 +978,7 @@ public class Service {
                     datos.put("departamento", departamento);
 
                     // Busco en cache
-                    String cache = tsigCache.obtenerDeCache(datos);
+                    String cache = repository.obtenerBusquedaDeCache(datos);
                     if (cache != null) {
                         System.out.println("Cache Si");
                         List<ModeloDireccionIde> res = objectMapper.readValue(cache,
@@ -1018,7 +1012,7 @@ public class Service {
 
                     // Agrego response para guardar en cache
                     datos.put("response", jsonString);
-                    tsigCache.insertarEnCache(datos);
+                    repository.insertarBusquedaEnCache(datos);
 
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
@@ -1062,7 +1056,7 @@ public class Service {
                     datos.put("departamento", departamento);
 
                     // Busco en cache
-                    String cache = tsigCache.obtenerDeCache(datos);
+                    String cache = repository.obtenerBusquedaDeCache(datos);
                     if (cache != null) {
                         System.out.println("Cache Si");
                         List<ModeloDireccionIde> res = objectMapper.readValue(cache,
@@ -1093,7 +1087,7 @@ public class Service {
 
                     // Agrego response para guardar en cache
                     datos.put("response", jsonString);
-                    tsigCache.insertarEnCache(datos);
+                    repository.insertarBusquedaEnCache(datos);
 
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
@@ -1139,7 +1133,7 @@ public class Service {
                     datos.put("kilometro", kilometro.toString());
 
                     // Busco en cache
-                    String cache = tsigCache.obtenerDeCache(datos);
+                    String cache = repository.obtenerBusquedaDeCache(datos);
                     if (cache != null) {
                         System.out.println("Cache Si");
                         List<ModeloRutaKmIde> res = objectMapper.readValue(cache, new TypeReference<>() {
@@ -1170,7 +1164,7 @@ public class Service {
 
                     datos.put("response", jsonString);
 
-                    tsigCache.insertarEnCache(datos);
+                    repository.insertarBusquedaEnCache(datos);
 
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
@@ -1208,7 +1202,7 @@ public class Service {
                     datos.put("numero", numero);
 
                     // Busco en cache
-                    String cache = tsigCache.obtenerDeCache(datos);
+                    String cache = repository.obtenerBusquedaDeCache(datos);
                     if (cache != null) {
                         System.out.println("Cache Si");
                         List<ModeloDireccionIde> res = objectMapper.readValue(cache,
@@ -1239,7 +1233,7 @@ public class Service {
 
                     // Datos para guardar en cache
                     datos.put("response", jsonString);
-                    tsigCache.insertarEnCache(datos);
+                    repository.insertarBusquedaEnCache(datos);
 
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
@@ -1288,7 +1282,7 @@ public class Service {
                     datos.put("numero", numero);
 
                     // Busco en cache
-                    String cache = tsigCache.obtenerDeCache(datos);
+                    String cache = repository.obtenerBusquedaDeCache(datos);
                     if (cache != null) {
                         System.out.println("Cache Si");
                         List<ModeloDireccionNominatin> myObjects = objectMapper.readValue(cache,
@@ -1323,7 +1317,7 @@ public class Service {
 
                     // Datos para guardar en cache
                     datos.put("response", jsonString);
-                    tsigCache.insertarEnCache(datos);
+                    repository.insertarBusquedaEnCache(datos);
 
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
@@ -1363,7 +1357,7 @@ public class Service {
                     datos.put("departamento", departamento);
 
                     // Busco en cache
-                    String cache = tsigCache.obtenerDeCache(datos);
+                    String cache = repository.obtenerBusquedaDeCache(datos);
                     if (cache != null) {
                         System.out.println("Cache Si");
                         List<ModeloDireccionNominatin> myObjects = objectMapper.readValue(cache,
@@ -1398,7 +1392,7 @@ public class Service {
                     jsonString = response.getBody();
 
                     datos.put("response", jsonString);
-                    tsigCache.insertarEnCache(datos);
+                    repository.insertarBusquedaEnCache(datos);
 
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
@@ -1446,7 +1440,7 @@ public class Service {
                     datos.put("numero", numero);
 
                     // Busco en cache
-                    String cache = tsigCache.obtenerDeCache(datos);
+                    String cache = repository.obtenerBusquedaDeCache(datos);
                     if (cache != null) {
                         System.out.println("Cache Si");
                         ModeloDireccionPhoton myObjects = objectMapper.readValue(cache,
@@ -1481,7 +1475,7 @@ public class Service {
 
                     // Datos para guardar en cache
                     datos.put("response", jsonString);
-                    tsigCache.insertarEnCache(datos);
+                    repository.insertarBusquedaEnCache(datos);
 
                     // Crear un ObjectMapper de Jackson
                     objectMapper = new ObjectMapper();
@@ -1533,7 +1527,7 @@ public class Service {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("entrada", entrada);
         params.add("todos", todos != null ? todos.toString() : "false");
-        String cache = tsigCache.obtenerDeCacheSugerencia(entrada, (todos != null) ? todos : false);
+        String cache = repository.obtenerSugerenciaDeCache(entrada, (todos != null) ? todos : false);
         if (cache != null) {
             System.out.println("Cache Si");
             return new ResponseEntity<>(cache, headers, HttpStatus.OK);
@@ -1555,7 +1549,7 @@ public class Service {
 
         String jsonString = response.getBody();
 
-        tsigCache.insertarEnCacheSugerencia(entrada, (todos != null) ? todos : false, jsonString);
+        repository.insertarEnCacheSugerencia(entrada, (todos != null) ? todos : false, jsonString);
 
         return response;
     }
