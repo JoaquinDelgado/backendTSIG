@@ -10,6 +10,7 @@ import com.example.tsig.models.photon.ModeloDireccionPhoton;
 import com.example.tsig.models.resultadocombinado.DireccionCombinada;
 import com.example.tsig.models.resultadocombinado.DireccionGeoCodificador;
 import com.example.tsig.repositories.Repository;
+import com.example.tsig.utils.Constante;
 import com.example.tsig.utils.Utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -148,7 +149,7 @@ public class Service {
                         Double lon = (Double) objeto.get("puntoX");
                         Double lat = (Double) objeto.get("puntoY");
                         if (error.isEmpty()) {
-                            repository.insertarCoordenadas(input, "IDE", lat, lon);
+                            repository.insertarCoordenadas(input,Constante.IDE ,lat, lon);
                         }
                     }
                     List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
@@ -233,7 +234,7 @@ public class Service {
                         Double lon = (Double) objeto.get("puntoX");
                         Double lat = (Double) objeto.get("puntoY");
                         if (error.isEmpty()) {
-                            repository.insertarCoordenadas(input, "IDE", lat, lon);
+                            repository.insertarCoordenadas(input, Constante.IDE, lat, lon);
                         }
                     }
                     List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
@@ -324,7 +325,7 @@ public class Service {
                         Double lon = (Double) objeto.get("puntoX");
                         Double lat = (Double) objeto.get("puntoY");
                         if (error.isEmpty()) {
-                            repository.insertarCoordenadas(input, "IDE", lat, lon);
+                            repository.insertarCoordenadas(input, Constante.IDE, lat, lon);
                         }
                     }
                     List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
@@ -396,7 +397,7 @@ public class Service {
                             Double lon = (Double) objeto.get("puntoX");
                             Double lat = (Double) objeto.get("puntoY");
                             if (error.isEmpty()) {
-                                repository.insertarCoordenadas(input, "IDE", lat, lon);
+                                repository.insertarCoordenadas(input, Constante.IDE, lat, lon);
                             }
                         }
                         for (ModeloDireccionIde ide : res) {
@@ -546,7 +547,7 @@ public class Service {
                         // Acceder a los atributos de cada objeto
                         Double lon = (Double) objeto.get("lon");
                         Double lat = (Double) objeto.get("lat");
-                        repository.insertarCoordenadas(input, "IDE", lat, lon);
+                        repository.insertarCoordenadas(input, Constante.IDE, lat, lon);
                     }
                     List<ModeloGeneral> resultado = new ArrayList<>();
                     for (ModeloRutaKmIde ide : res) {
@@ -617,7 +618,7 @@ public class Service {
                             Double lon = (Double) objeto.get("puntoX");
                             Double lat = (Double) objeto.get("puntoY");
                             if (error.isEmpty()) {
-                                repository.insertarCoordenadas(input, "IDE", lat, lon);
+                                repository.insertarCoordenadas(input, Constante.IDE, lat, lon);
                             }
                         }
                         for (ModeloDireccionIde ide : res) {
@@ -752,7 +753,7 @@ public class Service {
                         List<Double> coordenadas = (List<Double>) geometry.get("coordinates");
                         Double latitud = coordenadas.get(1);
                         Double longitud = coordenadas.get(0);
-                        repository.insertarCoordenadas(input, "PHOTON", latitud, longitud);
+                        repository.insertarCoordenadas(input, Constante.PHOTON, latitud, longitud);
 
                         ModeloDireccionPhoton myObjects = objectMapper.readValue(photonJsonString,new TypeReference<ModeloDireccionPhoton>() {});
                         photonResultado = new ArrayList<ModeloGeneral>();
@@ -856,7 +857,7 @@ public class Service {
                         Double lon = (Double) objeto.get("puntoX");
                         Double lat = (Double) objeto.get("puntoY");
                         if (error.isEmpty()) {
-                            repository.insertarCoordenadas(input, "IDE", lat, lon);
+                            repository.insertarCoordenadas(input, Constante.IDE, lat, lon);
                         }
                     }
 
@@ -938,7 +939,7 @@ public class Service {
                         Double lon = (Double) objeto.get("puntoX");
                         Double lat = (Double) objeto.get("puntoY");
                         if (error.isEmpty()) {
-                            repository.insertarCoordenadas(input, "IDE", lat, lon);
+                            repository.insertarCoordenadas(input, Constante.IDE, lat, lon);
                         }
                     }
                     List<ModeloDireccionIde> res = objectMapper.readValue(jsonString,
@@ -1030,7 +1031,7 @@ public class Service {
                         Double lon = (Double) objeto.get("puntoX");
                         Double lat = (Double) objeto.get("puntoY");
                         if (error.isEmpty()) {
-                            repository.insertarCoordenadas(input, "IDE", lat, lon);
+                            repository.insertarCoordenadas(input, Constante.IDE, lat, lon);
                         }
                     }
                     List<ModeloDireccionIde> res = objectMapper.readValue(jsonString,
@@ -1105,7 +1106,7 @@ public class Service {
                         Double lon = (Double) objeto.get("puntoX");
                         Double lat = (Double) objeto.get("puntoY");
                         if (error.isEmpty()) {
-                            repository.insertarCoordenadas(input, "IDE", lat, lon);
+                            repository.insertarCoordenadas(input, Constante.IDE, lat, lon);
                         }
                     }
                     List<ModeloDireccionIde> res = objectMapper.readValue(jsonString,
@@ -1180,7 +1181,7 @@ public class Service {
                         // Acceder a los atributos de cada objeto
                         Double lon = (Double) objeto.get("lng");
                         Double lat = (Double) objeto.get("lat");
-                        repository.insertarCoordenadas(input, "IDE", lat, lon);
+                        repository.insertarCoordenadas(input, Constante.IDE, lat, lon);
                     }
                     List<ModeloRutaKmIde> res = objectMapper.readValue(jsonString, new TypeReference<>() {
                     });
@@ -1251,7 +1252,7 @@ public class Service {
                         Double lon = (Double) objeto.get("puntoX");
                         Double lat = (Double) objeto.get("puntoY");
                         if (error.isEmpty()) {
-                            repository.insertarCoordenadas(input, "IDE", lat, lon);
+                            repository.insertarCoordenadas(input, Constante.IDE, lat, lon);
                         }
                     }
                     List<ModeloDireccionIde> res = objectMapper.readValue(jsonString,
@@ -1494,7 +1495,7 @@ public class Service {
                     List<Double> coordenadas = (List<Double>) geometry.get("coordinates");
                     Double latitud = coordenadas.get(1);
                     Double longitud = coordenadas.get(0);
-                    repository.insertarCoordenadas(input, "PHOTON", latitud, longitud);
+                    repository.insertarCoordenadas(input, Constante.PHOTON, latitud, longitud);
 
                     ModeloDireccionPhoton myObjects = objectMapper.readValue(jsonString,
                             new TypeReference<ModeloDireccionPhoton>() {
@@ -1631,7 +1632,7 @@ public class Service {
             // Acceder a los atributos de cada objeto
             Double lon = Double.parseDouble((String) objeto.get("lon"));
             Double lat = Double.parseDouble((String) objeto.get("lat"));
-            repository.insertarCoordenadas(input, "NOMINATIM", lat, lon);
+            repository.insertarCoordenadas(input, Constante.NOMINATIM, lat, lon);
         }
         List<ModeloDireccionNominatin> myObjects = objectMapper.readValue(jsonString,
                 new TypeReference<>() {
@@ -1698,7 +1699,7 @@ public class Service {
                 direccionCombinada.setDepartamento(modeloGeneral.getDepartamento());
                 // Agregi geocoder a lista de geocoders
                 List<String> listaNombres = new ArrayList<String>(Arrays.asList(direccionCombinada.getGeoCoders()));
-                listaNombres.add("ide");
+                listaNombres.add(Constante.IDE);
                 direccionCombinada.setGeoCoders(listaNombres.toArray(new String[0]));
 
                 DireccionGeoCodificador ide = new DireccionGeoCodificador();
@@ -1723,7 +1724,7 @@ public class Service {
                         // Agregi geocoder a lista de geocoders
                         List<String> listaNombres = new ArrayList<String>(
                                 Arrays.asList(direccionesCombinada.getGeoCoders()));
-                        listaNombres.add("photon");
+                        listaNombres.add(Constante.PHOTON);
                         direccionesCombinada.setGeoCoders(listaNombres.toArray(new String[0]));
 
                         DireccionGeoCodificador photon = new DireccionGeoCodificador();
@@ -1748,7 +1749,7 @@ public class Service {
                     direccionCombinada.setDepartamento(modeloGeneral.getDepartamento());
                     // Agrego geocoder a lista de geocoders
                     List<String> listaNombres = new ArrayList<String>(Arrays.asList(direccionCombinada.getGeoCoders()));
-                    listaNombres.add("photon");
+                    listaNombres.add(Constante.PHOTON);
                     direccionCombinada.setGeoCoders(listaNombres.toArray(new String[0]));
 
                     DireccionGeoCodificador photon = new DireccionGeoCodificador();
@@ -1774,7 +1775,7 @@ public class Service {
                         // Agregi geocoder a lista de geocoders
                         List<String> listaNombres = new ArrayList<String>(
                                 Arrays.asList(direccionesCombinada.getGeoCoders()));
-                        listaNombres.add("nominatim");
+                        listaNombres.add(Constante.NOMINATIM);
                         direccionesCombinada.setGeoCoders(listaNombres.toArray(new String[0]));
 
                         DireccionGeoCodificador nominatim = new DireccionGeoCodificador();
@@ -1799,7 +1800,7 @@ public class Service {
                     direccionCombinada.setDepartamento(modeloGeneral.getDepartamento());
                     // Agrego geocoder a lista de geocoders
                     List<String> listaNombres = new ArrayList<String>(Arrays.asList(direccionCombinada.getGeoCoders()));
-                    listaNombres.add("nominatim");
+                    listaNombres.add(Constante.NOMINATIM);
                     direccionCombinada.setGeoCoders(listaNombres.toArray(new String[0]));
 
                     DireccionGeoCodificador nominatim = new DireccionGeoCodificador();
