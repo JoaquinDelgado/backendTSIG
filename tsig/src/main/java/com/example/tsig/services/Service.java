@@ -102,13 +102,14 @@ public class Service {
                     if (cache != null) {
                         System.out.println("Cache Si");
                         List<ModeloDireccionIde> res = objectMapper.readValue(cache,
-                                new TypeReference<List<ModeloDireccionIde>>() {
+                                new TypeReference<>() {
                                 });
-                        List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
+                        List<ModeloGeneral> resultado = new ArrayList<>();
                         for (ModeloDireccionIde ide : res) {
                             resultado.add(Utils.direccionIdeToModeloGeneral(ide));
                         }
-                        return new ResponseEntity<>(resultado, headers, HttpStatus.OK);
+                        return new ResponseEntity<>(combinarResultado(resultado, null, null),
+                                headers, HttpStatus.OK);
                     } else {
                         System.out.println("Cache No");
                     }
@@ -152,7 +153,8 @@ public class Service {
                     for (ModeloDireccionIde ide : res) {
                         resultado.add(Utils.direccionIdeToModeloGeneral(ide));
                     }
-                    return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
+                    return new ResponseEntity<>(combinarResultado(resultado, null, null),
+                            headers, HttpStatus.OK);
                 }
                 case 2 -> {
                     if (calle == null) {
@@ -182,13 +184,14 @@ public class Service {
                     if (cache != null) {
                         System.out.println("Cache Si");
                         List<ModeloDireccionIde> res = objectMapper.readValue(cache,
-                                new TypeReference<List<ModeloDireccionIde>>() {
+                                new TypeReference<>() {
                                 });
-                        List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
+                        List<ModeloGeneral> resultado = new ArrayList<>();
                         for (ModeloDireccionIde ide : res) {
                             resultado.add(Utils.direccionIdeToModeloGeneral(ide));
                         }
-                        return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
+                        return new ResponseEntity<>(combinarResultado(resultado, null, null),
+                                headers, HttpStatus.OK);
                     } else {
                         System.out.println("Cache No");
                     }
@@ -233,11 +236,12 @@ public class Service {
                             repository.insertarCoordenadas(input, Constante.IDE, lat, lon);
                         }
                     }
-                    List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
+                    List<ModeloGeneral> resultado = new ArrayList<>();
                     for (ModeloDireccionIde ide : res) {
                         resultado.add(Utils.direccionIdeToModeloGeneral(ide));
                     }
-                    return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
+                    return new ResponseEntity<>(combinarResultado(resultado, null, null),
+                            headers, HttpStatus.OK);
                 }
                 case 3 -> {
                     if (departamento == null) {
@@ -274,13 +278,14 @@ public class Service {
                     if (cache != null) {
                         System.out.println("Cache Si");
                         List<ModeloDireccionIde> res = objectMapper.readValue(cache,
-                                new TypeReference<List<ModeloDireccionIde>>() {
+                                new TypeReference<>() {
                                 });
-                        List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
+                        List<ModeloGeneral> resultado = new ArrayList<>();
                         for (ModeloDireccionIde ide : res) {
                             resultado.add(Utils.direccionIdeToModeloGeneral(ide));
                         }
-                        return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
+                        return new ResponseEntity<>(combinarResultado(resultado, null, null),
+                                headers, HttpStatus.OK);
                     } else {
                         System.out.println("Cache No");
                     }
@@ -324,11 +329,12 @@ public class Service {
                             repository.insertarCoordenadas(input, Constante.IDE, lat, lon);
                         }
                     }
-                    List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
+                    List<ModeloGeneral> resultado = new ArrayList<>();
                     for (ModeloDireccionIde ide : res) {
                         resultado.add(Utils.direccionIdeToModeloGeneral(ide));
                     }
-                    return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
+                    return new ResponseEntity<>(combinarResultado(resultado, null, null),
+                            headers, HttpStatus.OK);
                 }
                 case 4 -> {
                     // IDE
@@ -470,13 +476,8 @@ public class Service {
                             nominatimResultado.add(Utils.direccionNominatimToModeloGeneral(nom));
                         }
                     }
-
-                    // RESPONSE FINAL
-                    // Convertir JSON1 a objeto Java
-                    List<ModeloGeneral> concatenatedList = new ArrayList<>();
-                    concatenatedList.addAll(ideResultado);
-                    concatenatedList.addAll(nominatimResultado);
-                    return new ResponseEntity<>(concatenatedList, headers, HttpStatus.OK);
+                    return new ResponseEntity<>(combinarResultado(ideResultado, nominatimResultado, null),
+                            headers, HttpStatus.OK);
                 }
                 case 5 -> {
                     if (numeroRuta == null) {
@@ -503,11 +504,12 @@ public class Service {
                         System.out.println("Cache Si");
                         List<ModeloRutaKmIde> res = objectMapper.readValue(cache, new TypeReference<>() {
                         });
-                        List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
+                        List<ModeloGeneral> resultado = new ArrayList<>();
                         for (ModeloRutaKmIde ide : res) {
                             resultado.add(Utils.rutaKmIdeToModeloGeneral(ide));
                         }
-                        return new ResponseEntity<>(resultado, headers, HttpStatus.OK);
+                        return new ResponseEntity<>(combinarResultado(resultado, null, null),
+                                headers, HttpStatus.OK);
                     } else {
                         System.out.println("Cache No");
                     }
@@ -549,7 +551,8 @@ public class Service {
                     for (ModeloRutaKmIde ide : res) {
                         resultado.add(Utils.rutaKmIdeToModeloGeneral(ide));
                     }
-                    return new ResponseEntity<>(resultado, headers, HttpStatus.OK);
+                    return new ResponseEntity<>(combinarResultado(resultado, null, null),
+                            headers, HttpStatus.OK);
                 }
                 case 6 -> {
                     // IDE
@@ -757,20 +760,9 @@ public class Service {
                             if (myObjects.getFeatures()[i].getProperties().getCountry().equalsIgnoreCase("Uruguay"))
                                 photonResultado.add(Utils.direccionPhotonToModeloGeneral(myObjects, i));
                         }
-
                     }
-
-                    // RESPONSE FINAL
-                    // Convertir JSON1 a objeto Java
-                    List<ModeloGeneral> concatenatedList = new ArrayList<>();
-                    concatenatedList.addAll(ideResultado);
-                    concatenatedList.addAll(nominatimResultado);
-                    concatenatedList.addAll(photonResultado);
-
-                    // return new ResponseEntity<>(concatenatedList, headers, HttpStatus.OK);
                     return new ResponseEntity<>(combinarResultado(ideResultado, nominatimResultado, photonResultado),
                             headers, HttpStatus.OK);
-
                 }
                 default -> {
                     return new ResponseEntity<>("IDFORMACANONICA INVALIDO", headers, HttpStatus.BAD_REQUEST);
@@ -804,13 +796,14 @@ public class Service {
                     if (cache != null) {
                         System.out.println("Cache Si");
                         List<ModeloDireccionIde> res = objectMapper.readValue(cache,
-                                new TypeReference<List<ModeloDireccionIde>>() {
+                                new TypeReference<>() {
                                 });
-                        List<ModeloGeneral> resultado = new ArrayList<ModeloGeneral>();
+                        List<ModeloGeneral> resultado = new ArrayList<>();
                         for (ModeloDireccionIde ide : res) {
                             resultado.add(Utils.direccionIdeToModeloGeneral(ide));
                         }
-                        return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
+                        return new ResponseEntity<>(combinarResultado(resultado, null, null),
+                                headers, HttpStatus.OK);
                     } else {
                         System.out.println("Cache No");
                     }
@@ -861,7 +854,8 @@ public class Service {
                     for (ModeloDireccionIde ide : res) {
                         resultado.add(Utils.direccionIdeToModeloGeneral(ide));
                     }
-                    return new ResponseEntity<>(resultado, headers, HttpStatus.OK);
+                    return new ResponseEntity<>(combinarResultado(resultado, null, null),
+                            headers, HttpStatus.OK);
                 }
                 case 2 -> {
                     if (calle == null) {
@@ -897,7 +891,8 @@ public class Service {
                         for (ModeloDireccionIde ide : res) {
                             resultado.add(Utils.direccionIdeToModeloGeneral(ide));
                         }
-                        return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
+                        return new ResponseEntity<>(combinarResultado(resultado, null, null),
+                                headers, HttpStatus.OK);
                     } else {
                         System.out.println("Cache No");
                     }
@@ -945,7 +940,8 @@ public class Service {
                     for (ModeloDireccionIde ide : res) {
                         resultado.add(Utils.direccionIdeToModeloGeneral(ide));
                     }
-                    return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
+                    return new ResponseEntity<>(combinarResultado(resultado, null, null),
+                            headers, HttpStatus.OK);
 
                 }
                 case 3 -> {
@@ -989,7 +985,8 @@ public class Service {
                         for (ModeloDireccionIde ide : res) {
                             resultado.add(Utils.direccionIdeToModeloGeneral(ide));
                         }
-                        return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
+                        return new ResponseEntity<>(combinarResultado(resultado, null, null),
+                                headers, HttpStatus.OK);
                     } else {
                         System.out.println("Cache No");
                     }
@@ -1037,7 +1034,8 @@ public class Service {
                     for (ModeloDireccionIde ide : res) {
                         resultado.add(Utils.direccionIdeToModeloGeneral(ide));
                     }
-                    return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
+                    return new ResponseEntity<>(combinarResultado(resultado, null, null),
+                            headers, HttpStatus.OK);
                 }
                 case 4 -> {
                     if (nombreInmueble == null) {
@@ -1067,7 +1065,8 @@ public class Service {
                         for (ModeloDireccionIde ide : res) {
                             resultado.add(Utils.direccionIdeToModeloGeneral(ide));
                         }
-                        return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
+                        return new ResponseEntity<>(combinarResultado(resultado, null, null),
+                                headers, HttpStatus.OK);
                     } else {
                         System.out.println("Cache No");
                     }
@@ -1112,7 +1111,8 @@ public class Service {
                     for (ModeloDireccionIde ide : res) {
                         resultado.add(Utils.direccionIdeToModeloGeneral(ide));
                     }
-                    return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
+                    return new ResponseEntity<>(combinarResultado(resultado, null, null),
+                            headers, HttpStatus.OK);
                 }
                 case 5 -> {
                     if (numeroRuta == null) {
@@ -1143,7 +1143,8 @@ public class Service {
                         for (ModeloRutaKmIde ide : res) {
                             resultado.add(Utils.rutaKmIdeToModeloGeneral(ide));
                         }
-                        return new ResponseEntity<>(resultado, headers, HttpStatus.OK);
+                        return new ResponseEntity<>(combinarResultado(resultado, null, null),
+                                headers, HttpStatus.OK);
                     } else {
                         System.out.println("Cache No");
                     }
@@ -1185,7 +1186,8 @@ public class Service {
                     for (ModeloRutaKmIde ide : res) {
                         resultado.add(Utils.rutaKmIdeToModeloGeneral(ide));
                     }
-                    return new ResponseEntity<>(resultado, headers, HttpStatus.OK);
+                    return new ResponseEntity<>(combinarResultado(resultado, null, null),
+                            headers, HttpStatus.OK);
                 }
                 case 6 -> {
                     if (calle == null) {
@@ -1213,7 +1215,8 @@ public class Service {
                         for (ModeloDireccionIde ide : res) {
                             resultado.add(Utils.direccionIdeToModeloGeneral(ide));
                         }
-                        return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
+                        return new ResponseEntity<>(combinarResultado(resultado, null, null),
+                                headers, HttpStatus.OK);
                     } else {
                         System.out.println("Cache No");
                     }
@@ -1258,7 +1261,8 @@ public class Service {
                     for (ModeloDireccionIde ide : res) {
                         resultado.add(Utils.direccionIdeToModeloGeneral(ide));
                     }
-                    return new ResponseEntity<>(resultado, headers, HttpStatus.OK);
+                    return new ResponseEntity<>(combinarResultado(resultado, null, null),
+                            headers, HttpStatus.OK);
                 }
                 default -> {
                     return new ResponseEntity<>("IDFORMACANONICA INVALIDO", headers, HttpStatus.BAD_REQUEST);
@@ -1293,9 +1297,8 @@ public class Service {
                         for (ModeloDireccionNominatin nom : myObjects) {
                             resultado.add(Utils.direccionNominatimToModeloGeneral(nom));
                         }
-                        return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
-
-                        // return new ResponseEntity<>(cache, headers, HttpStatus.OK);
+                        return new ResponseEntity<>(combinarResultado(null, resultado, null),
+                                headers, HttpStatus.OK);
                     } else {
                         System.out.println("Cache No");
                     }
@@ -1340,7 +1343,8 @@ public class Service {
                     for (ModeloDireccionNominatin nom : myObjects) {
                         resultado.add(Utils.direccionNominatimToModeloGeneral(nom));
                     }
-                    return new ResponseEntity<>(resultado, headers, HttpStatus.OK);
+                    return new ResponseEntity<>(combinarResultado(null, resultado, null),
+                            headers, HttpStatus.OK);
                 }
                 case 4 -> {
                     // Construir la URL con los parámetros
@@ -1368,9 +1372,8 @@ public class Service {
                         for (ModeloDireccionNominatin nom : myObjects) {
                             resultado.add(Utils.direccionNominatimToModeloGeneral(nom));
                         }
-                        return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
-
-                        // return new ResponseEntity<>(cache, headers, HttpStatus.OK);
+                        return new ResponseEntity<>(combinarResultado(null, resultado, null),
+                                headers, HttpStatus.OK);
                     } else {
                         System.out.println("Cache No");
                     }
@@ -1415,7 +1418,8 @@ public class Service {
                     for (ModeloDireccionNominatin nom : myObjects) {
                         resultado.add(Utils.direccionNominatimToModeloGeneral(nom));
                     }
-                    return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
+                    return new ResponseEntity<>(combinarResultado(null, resultado, null),
+                            headers, HttpStatus.OK);
 
                 }
                 default -> {
@@ -1453,7 +1457,8 @@ public class Service {
                             if (myObjects.getFeatures()[i].getProperties().getCountry().equalsIgnoreCase("Uruguay"))
                                 resultado.add(Utils.direccionPhotonToModeloGeneral(myObjects, i));
                         }
-                        return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
+                        return new ResponseEntity<>(combinarResultado(null, null, resultado),
+                                headers, HttpStatus.OK);
                     } else {
                         System.out.println("Cache No");
                     }
@@ -1502,10 +1507,8 @@ public class Service {
                         if (myObjects.getFeatures()[i].getProperties().getCountry().equalsIgnoreCase("Uruguay"))
                             resultado.add(Utils.direccionPhotonToModeloGeneral(myObjects, i));
                     }
-                    return new ResponseEntity<List<ModeloGeneral>>(resultado, headers, HttpStatus.OK);
-                    // return new ResponseEntity<ModeloGeneral>(
-                    // Utils.direccionPhotonToModeloGeneral(myObjects), headers,HttpStatus.OK);
-                    // return response;
+                    return new ResponseEntity<>(combinarResultado(null, null, resultado),
+                            headers, HttpStatus.OK);
                 }
                 return new ResponseEntity<>(
                         "El idFormaCanonica " + idFormaCanonica + " no es valido para el geocoder seleccionado.",
@@ -1649,7 +1652,8 @@ public class Service {
         for (ModeloDireccionNominatin nom : myObjects) {
             resultado.add(Utils.direccionNominatimToModeloGeneral(nom));
         }
-        return new ResponseEntity<>(resultado, headers, HttpStatus.OK);
+        return new ResponseEntity<>(combinarResultado(null, resultado, null),
+                headers, HttpStatus.OK);
     }
 
     public ResponseEntity<?> reverse(Double latitud, Double longitud, Integer limit) throws JsonProcessingException {

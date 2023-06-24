@@ -44,7 +44,7 @@ Pasos para poder establecer conexion con base de datos
    VALUES
    ('calle,numero,localidad,departamento'),
    ('calle,numero,calle2,localidad,departamento'),
-   ('calle,manzana,solar,localidad,departamento'),
+   ('manzana,solar,localidad,departamento'),
    ('nombreInmueble,departamento'),
    ('numeroRuta,kilometro'),
    ('calle,numero');
