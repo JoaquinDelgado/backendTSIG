@@ -1566,7 +1566,7 @@ public class Service {
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
 
-        String poligono = "{\"type\":\"Polygon\",\"coordinates\":[[[:lat0, :long0],[:lat1, :long1],[:lat2, :long2],[:lat3, :long3]]]}";        
+        String poligono = "{\"type\":\"Polygon\",\"coordinates\":[[[:long0, :lat0],[:long1, :lat1],[:long2, :lat2],[:long3, :lat3]]]}";        
         poligono=poligono.replace(":lat0", puntos.get(0).getLatitud().toString());
         poligono=poligono.replace(":long0", puntos.get(0).getLongitud().toString());
         poligono=poligono.replace(":lat1", puntos.get(1).getLatitud().toString());
