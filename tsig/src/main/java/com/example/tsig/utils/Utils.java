@@ -29,7 +29,7 @@ public class Utils {
         String numero = dirIde.getDireccion().getNumero() != null ? " " + dirIde.getDireccion().getNumero().getNro_puerta().toString() : "";
         String calleTemp = dirIde.getDireccion().getCalle() != null ? dirIde.getDireccion().getCalle().getNombre_normalizado() + numero : dirIde.getDireccion().getDepartamento().getNombre_normalizado() +" "+dirIde.getDireccion().getLocalidad().getNombre_normalizado();
         String calleDefinitivo = dirIde.getDireccion().getInmueble() != null ? dirIde.getDireccion().getInmueble().getNombre() + ", " + calleTemp : calleTemp;
-        return new ModeloGeneral("IDE",
+        return new ModeloGeneral(Constante.IDE,
                 calleDefinitivo,
                 dirIde.getDireccion().getDepartamento().getNombre_normalizado(),
                 dirIde.getDireccion().getLocalidad().getNombre_normalizado(),
@@ -39,7 +39,7 @@ public class Utils {
     }
 
     public static ModeloGeneral rutaKmIdeToModeloGeneral(ModeloRutaKmIde rutaKmIde) {
-        return new ModeloGeneral("IDE",
+        return new ModeloGeneral(Constante.IDE,
                 rutaKmIde.getAddress(),
                 rutaKmIde.getDepartamento(),
                 rutaKmIde.getLocalidad(),
@@ -49,7 +49,7 @@ public class Utils {
     }
 
     public static ModeloGeneral direccionNominatimToModeloGeneral(ModeloDireccionNominatin dirNominatin) {
-        ModeloGeneral mg = new ModeloGeneral("NOMINATIM",
+        ModeloGeneral mg = new ModeloGeneral(Constante.NOMINATIM,
                 dirNominatin.getDisplay_name(),
                 null,
                 null,
@@ -63,7 +63,7 @@ public class Utils {
         String direccion = dirPhoton.getFeatures()[i].getProperties().getName() != null ? dirPhoton.getFeatures()[i].getProperties().getName() : dirPhoton.getFeatures()[i].getProperties().getStreet() + " "
                 + dirPhoton.getFeatures()[i].getProperties().getHousenumber();
 
-        ModeloGeneral mg = new ModeloGeneral("PHOTON",
+        ModeloGeneral mg = new ModeloGeneral(Constante.PHOTON,
                 direccion,
                 dirPhoton.getFeatures()[i].getProperties().getCity(),
                 dirPhoton.getFeatures()[i].getProperties().getDistrict(),
@@ -100,7 +100,7 @@ public class Utils {
 
     public static boolean isEqualsDirModeloGeneral(ModeloGeneral mg1, DireccionCombinada mg2) {
         
-        if(mg1.getGeoCoder().equalsIgnoreCase("NOMINATIM")){
+        if(mg1.getGeoCoder().equalsIgnoreCase(Constante.NOMINATIM)){
           String departamento = "";  
           String[] matches = mg1.getNombreNormalizado().split(",\\s*");
             if (matches.length >= 3) {
@@ -118,9 +118,9 @@ public class Utils {
 
         boolean distance0 = false;
         String direccion1 ="";
-        if(mg1.getGeoCoder().equalsIgnoreCase("PHOTON"))
+        if(mg1.getGeoCoder().equalsIgnoreCase(Constante.PHOTON))
             direccion1 = RemplazarTildesYEspacios(mg1.getNombreNormalizado()).toUpperCase().replace(".", "");
-        if(mg1.getGeoCoder().equalsIgnoreCase("NOMINATIM")){
+        if(mg1.getGeoCoder().equalsIgnoreCase(Constante.NOMINATIM)){
             direccion1 = RemplazarTildesYEspacios(mg1.getNombreNormalizado()).toUpperCase().replace(".", "");
             // Definir la expresión regular
             String regex = ".*(?=,\\s*[^,]*$)";
@@ -190,7 +190,7 @@ public class Utils {
         DireccionCombinada res =  new DireccionCombinada();
         res.setNombreNormalizado(reverseIde.getAddress());
         res.setDepartamento(reverseIde.getDepartamento());
-        res.setGeoCoders(new String[]{"ide"});
+        res.setGeoCoders(new String[]{Constante.IDE});
         res.setIDE(dirIde);
         res.setNominatim(null);
         res.setPhoton(null);
