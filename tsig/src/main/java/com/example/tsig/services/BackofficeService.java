@@ -1,5 +1,6 @@
 package com.example.tsig.services;
 
+import com.example.tsig.models.datoscomparativos.ModeloDatoComparativo;
 import com.example.tsig.models.general.ModeloGeneral;
 import com.example.tsig.models.ide.ModeloDireccionIde;
 import com.example.tsig.models.im.DireccionIM;
@@ -28,23 +29,33 @@ public class BackofficeService {
 
     //por cada elemento del array -> para cada geocoder, busco la dir del array con dicho geocoder, obtengo las coordenadas y llamo al haveersineDistance
     // inserto en la tabla distancias_im_geocoders el id del elemento del array, el id del geocoder, las coordenadas del geocoder, y el resultado de haversineDistance
-    public void HaversineDistanceCalculator() throws JsonProcessingException {
+    public ResponseEntity<?> HaversineDistanceCalculator() throws JsonProcessingException {
         Map<Integer, DireccionIM> direccionesIM = repository.obtenerDireccionesIM();
         for (Map.Entry<Integer, DireccionIM> direccionIMEntry : direccionesIM.entrySet()) {
             DireccionIM value = direccionIMEntry.getValue();
             //IDE
-            Double[] coordenadas = PegarleAIDE(value.getCalle(), value.getNumero());
-            Double distancia = CalcularDistancia(value.getLatitud(), value.getLongitud(), coordenadas[0], coordenadas[1]);
-            repository.insertarDistancia(value.getId(), 1, coordenadas[0], coordenadas[1], distancia.floatValue());
+            ModeloDireccionIde dirIde = PegarleAIDE(value.getCalle(), value.getNumero());
+            String numero = dirIde.getDireccion().getNumero() != null ? " " + dirIde.getDireccion().getNumero().getNro_puerta().toString() : "";
+            String calleTemp = dirIde.getDireccion().getCalle() != null ? dirIde.getDireccion().getCalle().getNombre_normalizado() + numero : dirIde.getDireccion().getDepartamento().getNombre_normalizado() +" "+dirIde.getDireccion().getLocalidad().getNombre_normalizado();
+            String calleDefinitivo = dirIde.getDireccion().getInmueble() != null ? dirIde.getDireccion().getInmueble().getNombre() + ", " + calleTemp : calleTemp;
+            Double distancia = CalcularDistancia(value.getLatitud(), value.getLongitud(), dirIde.getPuntoY(), dirIde.getPuntoX());
+            repository.insertarDistancia(value.getId(), 1, calleDefinitivo,dirIde.getPuntoY(), dirIde.getPuntoX(), distancia.floatValue());
+          
             //NOMINATIM
-            coordenadas = PegarleANominatim(value.getCalle(), value.getNumero());
-            distancia = CalcularDistancia(value.getLatitud(), value.getLongitud(), coordenadas[0], coordenadas[1]);
-            repository.insertarDistancia(value.getId(), 2, coordenadas[0], coordenadas[1], distancia.floatValue());
+            ModeloDireccionNominatin dirNom = PegarleANominatim(value.getCalle(), value.getNumero());
+            distancia = CalcularDistancia(value.getLatitud(), value.getLongitud(), dirNom.getLat(), dirNom.getLon());
+            repository.insertarDistancia(value.getId(), 2, dirNom.getDisplay_name(), dirNom.getLat(), dirNom.getLon(), distancia.floatValue());
             //PHOTON
-            coordenadas = PegarleAPhoton(value.getCalle(), value.getNumero());
-            distancia = CalcularDistancia(value.getLatitud(), value.getLongitud(), coordenadas[0], coordenadas[1]);
-            repository.insertarDistancia(value.getId(), 3, coordenadas[0], coordenadas[1], distancia.floatValue());
+            ModeloDireccionPhoton dirPhoton = PegarleAPhoton(value.getCalle(), value.getNumero());
+            String direccion = dirPhoton.getFeatures()[0].getProperties().getName() != null ? dirPhoton.getFeatures()[0].getProperties().getName() : dirPhoton.getFeatures()[0].getProperties().getStreet() + " "
+                + dirPhoton.getFeatures()[0].getProperties().getHousenumber();
+            distancia = CalcularDistancia(value.getLatitud(), value.getLongitud(), dirPhoton.getFeatures()[0].getGeometry().getCoordinates()[1] , dirPhoton.getFeatures()[0].getGeometry().getCoordinates()[0]);
+            repository.insertarDistancia(value.getId(), 3, direccion,dirPhoton.getFeatures()[0].getGeometry().getCoordinates()[1], dirPhoton.getFeatures()[0].getGeometry().getCoordinates()[0], distancia.floatValue());
         }
+        List<ModeloDatoComparativo> datos = repository.obtenerDatosComparativos();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return new ResponseEntity<>(datos, headers, HttpStatus.OK);
     }
 
     private Double CalcularDistancia(double lat1, double lon1, double lat2, double lon2) {
@@ -59,7 +70,7 @@ public class BackofficeService {
         return 1000 * EARTH_RADIUS * c;
     }
 
-    private Double[] PegarleAIDE(String calle, Integer numero) throws JsonProcessingException {
+    private ModeloDireccionIde PegarleAIDE(String calle, Integer numero) throws JsonProcessingException {
         // Crear una entidad HttpEntity con los encabezados
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -85,24 +96,17 @@ public class BackofficeService {
 
         // Crear un ObjectMapper de Jackson
         ObjectMapper objectMapper = new ObjectMapper();
-        // Analizar la cadena de texto JSON en una lista de objetos Java
-        List<Map<String, Object>> listaObjetos = objectMapper.readValue(jsonString, new TypeReference<>() {
-        });
-        // Recorrer la lista de objetos
-        Double longitud = 0D;
-        Double latitud = 0D;
-        for (Map<String, Object> objeto : listaObjetos) {
-            // Acceder a los atributos de cada objeto
-            String error = (String) objeto.get("error");
-            if (Objects.equals(error, "")) {
-                longitud = (Double) objeto.get("puntoX");
-                latitud = (Double) objeto.get("puntoY");
+        List<ModeloDireccionIde> res = objectMapper.readValue(jsonString,new TypeReference<List<ModeloDireccionIde>>() {});
+        for(ModeloDireccionIde ide : res){
+            if(ide.getError()!=null || ide.getError().isEmpty()){
+                return ide;
             }
         }
-        return new Double[]{latitud, longitud};
+        return null;
+
     }
 
-    private Double[] PegarleANominatim(String calle, Integer numero) throws JsonProcessingException {
+    private ModeloDireccionNominatin PegarleANominatim(String calle, Integer numero) throws JsonProcessingException {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -126,23 +130,15 @@ public class BackofficeService {
         // Obtener la respuesta de ResponseEntity
         String jsonString = response.getBody();
 
-        // Crear un ObjectMapper de Jackson
         ObjectMapper objectMapper = new ObjectMapper();
-        // Analizar la cadena de texto JSON en una lista de objetos Java
-        List<Map<String, Object>> listaObjetos = objectMapper.readValue(jsonString, new TypeReference<List<Map<String, Object>>>() {
-        });
-        // Recorrer la lista de objetos
-        Double latitud = 0D;
-        Double longitud = 0D;
-        for (Map<String, Object> objeto : listaObjetos) {
-            // Acceder a los atributos de cada objeto
-            longitud = Double.parseDouble((String) objeto.get("lon"));
-            latitud = Double.parseDouble((String) objeto.get("lat"));
-        }
-        return new Double[]{latitud, longitud};
+        List<ModeloDireccionNominatin> res = objectMapper.readValue(jsonString,new TypeReference<List<ModeloDireccionNominatin>>() {});
+        if(res!=null && !res.isEmpty())
+            return res.get(0);
+        return null;
+
     }
 
-    private Double[] PegarleAPhoton(String calle, Integer numero) throws JsonProcessingException {
+    private ModeloDireccionPhoton PegarleAPhoton(String calle, Integer numero) throws JsonProcessingException {
         // Crear un ObjectMapper de Jackson
         ObjectMapper objectMapper = new ObjectMapper();
         RestTemplate restTemplate = new RestTemplate();
@@ -164,17 +160,8 @@ public class BackofficeService {
         // Obtener la respuesta de ResponseEntity
         String jsonString = response.getBody();
         // Analizar la cadena de texto JSON en un objeto Java
-        Map<String, Object> objeto = objectMapper.readValue(jsonString, new TypeReference<>() {
-        });
-
-        // Acceder a los valores del objeto
-        List<Map<String, Object>> listaObjetos = (List<Map<String, Object>>) objeto.get("features");
-        Map<String, Object> primerObjeto = listaObjetos.get(0);
-        Map<String, Object> geometry = (Map<String, Object>) primerObjeto.get("geometry");
-        List<Double> coordenadas = (List<Double>) geometry.get("coordinates");
-        Double latitud = coordenadas.get(1);
-        Double longitud = coordenadas.get(0);
-        return new Double[]{latitud,longitud};
+        ModeloDireccionPhoton res = objectMapper.readValue(jsonString,new TypeReference<ModeloDireccionPhoton>() {});
+        return res;
     }
 }
 

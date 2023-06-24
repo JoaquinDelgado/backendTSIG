@@ -117,8 +117,7 @@ class DireccionesController {
 
 	/////////////////// BACKOFFICE ////////////////////
 	@GetMapping("/backoffice/distancias")
-	public ResponseEntity<String> distancias() throws JsonProcessingException {
-		backofficeService.HaversineDistanceCalculator();
-		return new ResponseEntity<>(HttpStatus.CREATED);
+	public ResponseEntity<?> distancias() throws JsonProcessingException {
+		return backofficeService.HaversineDistanceCalculator();
 	}
 }
