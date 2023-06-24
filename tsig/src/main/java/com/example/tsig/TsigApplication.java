@@ -1,5 +1,6 @@
 package com.example.tsig;
 
+import com.example.tsig.models.general.Punto;
 import com.example.tsig.services.BackofficeService;
 import com.example.tsig.services.Service;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -12,12 +13,15 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
+import java.util.List;
 import java.util.Map;
 
 @SpringBootApplication
@@ -91,12 +95,12 @@ class DireccionesController {
 
 	}
 
-	@GetMapping("/direcEnPoligono")
+	@PostMapping("/direcEnPoligono")
 	@CrossOrigin(origins = "*")
 	public ResponseEntity<?> direcEnPoligono(@RequestParam(value = "limit", required = false) Integer limit,
-												  @RequestParam(value = "poligono") String poligono,
+												  @RequestBody List<Punto> puntos,
 												  @RequestParam(value = "tipoDirec", required = false) String tipoDirec) throws JsonProcessingException {
-	  return service.direcEnPoligono(limit, poligono, tipoDirec);
+	  return service.direcEnPoligono(limit, puntos, tipoDirec);
 	}
 
 	@GetMapping("/busquedaSimple")

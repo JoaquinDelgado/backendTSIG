@@ -2,6 +2,7 @@ package com.example.tsig.services;
 
 import com.example.tsig.cache.TsigCache;
 import com.example.tsig.models.general.ModeloGeneral;
+import com.example.tsig.models.general.Punto;
 import com.example.tsig.models.ide.ModeloDireccionIde;
 import com.example.tsig.models.ide.ModeloRutaKmIde;
 import com.example.tsig.models.ide.ReverseIde;
@@ -1559,11 +1560,21 @@ public class Service {
         return response;
     }
 
-    public ResponseEntity<?> direcEnPoligono(Integer limit, String poligono, String tipoDirec) throws JsonProcessingException {
+    public ResponseEntity<?> direcEnPoligono(Integer limit, List<Punto> puntos, String tipoDirec) throws JsonProcessingException {
         WebClient webClient = WebClient.builder()
                 .baseUrl("https://direcciones.ide.uy/api/v1/geocode")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
+
+        String poligono = "{\"type\":\"Polygon\",\"coordinates\":[[[:lat0, :long0],[:lat1, :long1],[:lat2, :long2],[:lat3, :long3]]]}";        
+        poligono=poligono.replace(":lat0", puntos.get(0).getLatitud().toString());
+        poligono=poligono.replace(":long0", puntos.get(0).getLongitud().toString());
+        poligono=poligono.replace(":lat1", puntos.get(1).getLatitud().toString());
+        poligono=poligono.replace(":long1", puntos.get(1).getLongitud().toString());
+        poligono=poligono.replace(":lat2", puntos.get(2).getLatitud().toString());
+        poligono=poligono.replace(":long2", puntos.get(2).getLongitud().toString());
+        poligono=poligono.replace(":lat3", puntos.get(3).getLatitud().toString());
+        poligono=poligono.replace(":long3", puntos.get(3).getLongitud().toString());
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString("https://direcciones.ide.uy/api/v1/geocode/direcEnPoligono")
                 .queryParam("poligono", poligono);
