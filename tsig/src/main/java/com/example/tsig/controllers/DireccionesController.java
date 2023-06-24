@@ -1,5 +1,6 @@
 package com.example.tsig.controllers;
 
+import com.example.tsig.models.general.Poligono;
 import com.example.tsig.models.general.Punto;
 import com.example.tsig.services.BackofficeService;
 import com.example.tsig.services.Service;
@@ -89,9 +90,9 @@ public class DireccionesController {
 	@PostMapping("/direcEnPoligono")
 	@CrossOrigin(origins = "*")
 	public ResponseEntity<?> direcEnPoligono(@RequestParam(value = "limit", required = false) Integer limit,
-												  @RequestBody List<Punto> puntos,
+												  @RequestBody Poligono poligono,
 												  @RequestParam(value = "tipoDirec", required = false) String tipoDirec) throws JsonProcessingException {
-	  return service.direcEnPoligono(limit, puntos, tipoDirec);
+	  return service.direcEnPoligono(limit, poligono, tipoDirec);
 	}
 
 	@GetMapping("/busquedaSimple")

@@ -1,6 +1,7 @@
 package com.example.tsig.services;
 
 import com.example.tsig.models.general.ModeloGeneral;
+import com.example.tsig.models.general.Poligono;
 import com.example.tsig.models.general.Punto;
 import com.example.tsig.models.ide.ModeloDireccionIde;
 import com.example.tsig.models.ide.ModeloRutaKmIde;
@@ -1554,21 +1555,23 @@ public class Service {
         return response;
     }
 
-    public ResponseEntity<?> direcEnPoligono(Integer limit, List<Punto> puntos, String tipoDirec) throws JsonProcessingException {
+    public ResponseEntity<?> direcEnPoligono(Integer limit, Poligono polig, String tipoDirec) throws JsonProcessingException {
         WebClient webClient = WebClient.builder()
                 .baseUrl("https://direcciones.ide.uy/api/v1/geocode")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
 
+        List<Punto> puntos = polig.getPoligono();
+
         String poligono = "{\"type\":\"Polygon\",\"coordinates\":[[[:long0, :lat0],[:long1, :lat1],[:long2, :lat2],[:long3, :lat3]]]}";        
-        poligono=poligono.replace(":lat0", puntos.get(0).getLatitud().toString());
-        poligono=poligono.replace(":long0", puntos.get(0).getLongitud().toString());
-        poligono=poligono.replace(":lat1", puntos.get(1).getLatitud().toString());
-        poligono=poligono.replace(":long1", puntos.get(1).getLongitud().toString());
-        poligono=poligono.replace(":lat2", puntos.get(2).getLatitud().toString());
-        poligono=poligono.replace(":long2", puntos.get(2).getLongitud().toString());
-        poligono=poligono.replace(":lat3", puntos.get(3).getLatitud().toString());
-        poligono=poligono.replace(":long3", puntos.get(3).getLongitud().toString());
+        poligono=poligono.replace(":lat0", puntos.get(0).getLat().toString());
+        poligono=poligono.replace(":long0", puntos.get(0).getLng().toString());
+        poligono=poligono.replace(":lat1", puntos.get(1).getLat().toString());
+        poligono=poligono.replace(":long1", puntos.get(1).getLng().toString());
+        poligono=poligono.replace(":lat2", puntos.get(2).getLat().toString());
+        poligono=poligono.replace(":long2", puntos.get(2).getLng().toString());
+        poligono=poligono.replace(":lat3", puntos.get(3).getLat().toString());
+        poligono=poligono.replace(":long3", puntos.get(3).getLng().toString());
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString("https://direcciones.ide.uy/api/v1/geocode/direcEnPoligono")
                 .queryParam("poligono", poligono);
