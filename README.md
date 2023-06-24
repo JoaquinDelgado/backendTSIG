@@ -102,6 +102,7 @@ Pasos para poder establecer conexion con base de datos
       id serial PRIMARY key,
       id_direcciones_im integer,
       id_geocoder integer,
+      dir_geocoder character varying COLLATE pg_catalog."default",
       latitud_geocoder double precision,
       longitud_geocoder double precision,
       distancia_metros double precision
@@ -121,6 +122,17 @@ Pasos para poder establecer conexion con base de datos
       ('Camino Tomkinson', 2459, -34.8373196610002,-56.2731408350664),
       ('Hipólito Yrigoyen', 2069, -34.88062865081787,-56.111827816231106);
 
+CREATE OR REPLACE VIEW public.vista_datos_comparativos as
+select dir.calle||' '||dir.numero direccion_im,
+		dir.latitud latitud_im,
+		dir.longitud longitud_im,
+		geo.geocoder geocoder,
+		dis.dir_geocoder direccion_geocoder,
+		dis.latitud_geocoder latitud_geocoder,
+		dis.longitud_geocoder longitud_geocoder,
+		dis.distancia_metros distancia_metros 
+from geocoders geo, direcciones_im dir, distancias_im_geocoders dis
+where dis.id_geocoder=geo.id and dis.id_direcciones_im=dir.id;  
 
 3. En el application.properties deben colocar lo siguiente:
    spring.datasource.url=jdbc:postgresql://localhost:5432/tsig

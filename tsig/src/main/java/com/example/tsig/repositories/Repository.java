@@ -1,10 +1,12 @@
 package com.example.tsig.repositories;
 
+import com.example.tsig.models.datoscomparativos.ModeloDatoComparativo;
 import com.example.tsig.models.im.DireccionIM;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -154,11 +156,30 @@ public class Repository {
         return direccionesIM;
     }
 
-    public void insertarDistancia(Integer idElemento, Integer idGeocoder, Double lat, Double lon, Float distancia) {
-        String sql = "INSERT INTO distancias_im_geocoders (id_direcciones_im,id_geocoder,latitud_geocoder,longitud_geocoder, distancia_metros) VALUES (?,?,?,?,?)";
-        int rows = jdbcTemplate.update(sql, idElemento, idGeocoder, lat, lon, distancia);
+    public void insertarDistancia(Integer idElemento, Integer idGeocoder, String nombreNormalizado,Double lat, Double lon, Float distancia) {
+        String sql = "INSERT INTO distancias_im_geocoders (id_direcciones_im,id_geocoder,dir_geocoder,latitud_geocoder,longitud_geocoder, distancia_metros) VALUES (?,?,?,?,?,?)";
+        int rows = jdbcTemplate.update(sql, idElemento, idGeocoder,nombreNormalizado, lat, lon, distancia);
         if (rows > 0) {
             System.out.println("A new row has been inserted.");
         }
+    }
+
+    public List<ModeloDatoComparativo> obtenerDatosComparativos(){
+        List<ModeloDatoComparativo> datos = new ArrayList<>();
+        String sql = "SELECT * FROM vista_datos_comparativos";
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
+        for (Map<String, Object> row : rows) {
+            ModeloDatoComparativo dato = new ModeloDatoComparativo();
+            dato.setDireccionGeocoder((String) row.get("direccion_geocoder"));
+            dato.setDireccionIM((String) row.get("direccion_im"));
+            dato.setDistanciaMetros((Double) row.get("distancia_metros"));
+            dato.setLatitudGeocoder((Double) row.get("latitud_geocoder"));
+            dato.setLongitudGeocoder((Double) row.get("longitud_geocoder"));
+            dato.setLatitudIM((Double) row.get("latitud_im"));
+            dato.setLongitudIM((Double) row.get("longitud_im"));
+            dato.setGeocoder((String) row.get("geocoder"));
+            datos.add(dato);
+        }
+        return datos;
     }
 }
