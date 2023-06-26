@@ -52,10 +52,9 @@ public class BackofficeService {
             distancia = CalcularDistancia(value.getLatitud(), value.getLongitud(), dirPhoton.getFeatures()[0].getGeometry().getCoordinates()[1] , dirPhoton.getFeatures()[0].getGeometry().getCoordinates()[0]);
             repository.insertarDistancia(value.getId(), 3, direccion,dirPhoton.getFeatures()[0].getGeometry().getCoordinates()[1], dirPhoton.getFeatures()[0].getGeometry().getCoordinates()[0], distancia.floatValue());
         }
-        List<ModeloDatoComparativo> datos = repository.obtenerDatosComparativos();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        return new ResponseEntity<>(datos, headers, HttpStatus.OK);
+        return new ResponseEntity<>("Datos Insertados", headers, HttpStatus.OK);
     }
 
     private Double CalcularDistancia(double lat1, double lon1, double lat2, double lon2) {
@@ -96,9 +95,10 @@ public class BackofficeService {
 
         // Crear un ObjectMapper de Jackson
         ObjectMapper objectMapper = new ObjectMapper();
-        List<ModeloDireccionIde> res = objectMapper.readValue(jsonString,new TypeReference<List<ModeloDireccionIde>>() {});
+        List<ModeloDireccionIde> res = objectMapper.readValue(jsonString, new TypeReference<>() {
+        });
         for(ModeloDireccionIde ide : res){
-            if(ide.getError()!=null || ide.getError().isEmpty()){
+            if(ide.getError()!=null && ide.getError().isEmpty()){
                 return ide;
             }
         }
