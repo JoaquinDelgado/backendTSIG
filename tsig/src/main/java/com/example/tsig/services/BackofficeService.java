@@ -30,27 +30,30 @@ public class BackofficeService {
     //por cada elemento del array -> para cada geocoder, busco la dir del array con dicho geocoder, obtengo las coordenadas y llamo al haveersineDistance
     // inserto en la tabla distancias_im_geocoders el id del elemento del array, el id del geocoder, las coordenadas del geocoder, y el resultado de haversineDistance
     public ResponseEntity<?> HaversineDistanceCalculator() throws JsonProcessingException {
-        Map<Integer, DireccionIM> direccionesIM = repository.obtenerDireccionesIM();
-        for (Map.Entry<Integer, DireccionIM> direccionIMEntry : direccionesIM.entrySet()) {
-            DireccionIM value = direccionIMEntry.getValue();
-            //IDE
-            ModeloDireccionIde dirIde = PegarleAIDE(value.getCalle(), value.getNumero());
-            String numero = dirIde.getDireccion().getNumero() != null ? " " + dirIde.getDireccion().getNumero().getNro_puerta().toString() : "";
-            String calleTemp = dirIde.getDireccion().getCalle() != null ? dirIde.getDireccion().getCalle().getNombre_normalizado() + numero : dirIde.getDireccion().getDepartamento().getNombre_normalizado() +" "+dirIde.getDireccion().getLocalidad().getNombre_normalizado();
-            String calleDefinitivo = dirIde.getDireccion().getInmueble() != null ? dirIde.getDireccion().getInmueble().getNombre() + ", " + calleTemp : calleTemp;
-            Double distancia = CalcularDistancia(value.getLatitud(), value.getLongitud(), dirIde.getPuntoY(), dirIde.getPuntoX());
-            repository.insertarDistancia(value.getId(), 1, calleDefinitivo,dirIde.getPuntoY(), dirIde.getPuntoX(), distancia.floatValue());
-          
-            //NOMINATIM
-            ModeloDireccionNominatin dirNom = PegarleANominatim(value.getCalle(), value.getNumero());
-            distancia = CalcularDistancia(value.getLatitud(), value.getLongitud(), dirNom.getLat(), dirNom.getLon());
-            repository.insertarDistancia(value.getId(), 2, dirNom.getDisplay_name(), dirNom.getLat(), dirNom.getLon(), distancia.floatValue());
-            //PHOTON
-            ModeloDireccionPhoton dirPhoton = PegarleAPhoton(value.getCalle(), value.getNumero());
-            String direccion = dirPhoton.getFeatures()[0].getProperties().getName() != null ? dirPhoton.getFeatures()[0].getProperties().getName() : dirPhoton.getFeatures()[0].getProperties().getStreet() + " "
-                + dirPhoton.getFeatures()[0].getProperties().getHousenumber();
-            distancia = CalcularDistancia(value.getLatitud(), value.getLongitud(), dirPhoton.getFeatures()[0].getGeometry().getCoordinates()[1] , dirPhoton.getFeatures()[0].getGeometry().getCoordinates()[0]);
-            repository.insertarDistancia(value.getId(), 3, direccion,dirPhoton.getFeatures()[0].getGeometry().getCoordinates()[1], dirPhoton.getFeatures()[0].getGeometry().getCoordinates()[0], distancia.floatValue());
+        List<?> datos = repository.obtenerDatosComparativos();
+        if (datos.isEmpty()) {
+            Map<Integer, DireccionIM> direccionesIM = repository.obtenerDireccionesIM();
+            for (Map.Entry<Integer, DireccionIM> direccionIMEntry : direccionesIM.entrySet()) {
+                DireccionIM value = direccionIMEntry.getValue();
+                //IDE
+                ModeloDireccionIde dirIde = PegarleAIDE(value.getCalle(), value.getNumero());
+                String numero = dirIde.getDireccion().getNumero() != null ? " " + dirIde.getDireccion().getNumero().getNro_puerta().toString() : "";
+                String calleTemp = dirIde.getDireccion().getCalle() != null ? dirIde.getDireccion().getCalle().getNombre_normalizado() + numero : dirIde.getDireccion().getDepartamento().getNombre_normalizado() +" "+dirIde.getDireccion().getLocalidad().getNombre_normalizado();
+                String calleDefinitivo = dirIde.getDireccion().getInmueble() != null ? dirIde.getDireccion().getInmueble().getNombre() + ", " + calleTemp : calleTemp;
+                Double distancia = CalcularDistancia(value.getLatitud(), value.getLongitud(), dirIde.getPuntoY(), dirIde.getPuntoX());
+                repository.insertarDistancia(value.getId(), 1, calleDefinitivo,dirIde.getPuntoY(), dirIde.getPuntoX(), distancia.floatValue());
+
+                //NOMINATIM
+                ModeloDireccionNominatin dirNom = PegarleANominatim(value.getCalle(), value.getNumero());
+                distancia = CalcularDistancia(value.getLatitud(), value.getLongitud(), dirNom.getLat(), dirNom.getLon());
+                repository.insertarDistancia(value.getId(), 2, dirNom.getDisplay_name(), dirNom.getLat(), dirNom.getLon(), distancia.floatValue());
+                //PHOTON
+                ModeloDireccionPhoton dirPhoton = PegarleAPhoton(value.getCalle(), value.getNumero());
+                String direccion = dirPhoton.getFeatures()[0].getProperties().getName() != null ? dirPhoton.getFeatures()[0].getProperties().getName() : dirPhoton.getFeatures()[0].getProperties().getStreet() + " "
+                        + dirPhoton.getFeatures()[0].getProperties().getHousenumber();
+                distancia = CalcularDistancia(value.getLatitud(), value.getLongitud(), dirPhoton.getFeatures()[0].getGeometry().getCoordinates()[1] , dirPhoton.getFeatures()[0].getGeometry().getCoordinates()[0]);
+                repository.insertarDistancia(value.getId(), 3, direccion,dirPhoton.getFeatures()[0].getGeometry().getCoordinates()[1], dirPhoton.getFeatures()[0].getGeometry().getCoordinates()[0], distancia.floatValue());
+            }
         }
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
