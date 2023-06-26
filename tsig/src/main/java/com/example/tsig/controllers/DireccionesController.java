@@ -111,6 +111,12 @@ public class DireccionesController {
 		return service.reverse(latitud, longitud, limit);
 	}
 
+	@GetMapping("/obtenerDatosDeEstudio")
+	@CrossOrigin(origins = "*") // Permitir todas las IPs
+	public ResponseEntity<?> obtenerDatosDeEstudio() {
+		return service.obtenerDatosDeEstudio();
+	}
+
 	/////////////////// BACKOFFICE ////////////////////
 	@GetMapping("/backoffice/distancias")
 	public ResponseEntity<?> distancias() throws JsonProcessingException {

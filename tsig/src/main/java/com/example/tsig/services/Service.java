@@ -1,5 +1,6 @@
 package com.example.tsig.services;
 
+import com.example.tsig.models.datoscomparativos.ModeloDatoComparativo;
 import com.example.tsig.models.general.ModeloGeneral;
 import com.example.tsig.models.general.Poligono;
 import com.example.tsig.models.general.Punto;
@@ -1829,5 +1830,11 @@ public class Service {
         }
 
         return direccionesCombinadas;
+    }
+
+    public ResponseEntity<?> obtenerDatosDeEstudio()  {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return new ResponseEntity<>(repository.obtenerDatosComparativos(), headers, HttpStatus.OK);
     }
 }
